@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 
 const RecipeBookButton = styled.div`
     position: absolute;
-    bottom: 200px;  // Changed from top: -120px to bottom positioning
-    left: 450px;
+    bottom: 200px;
+    left: 45px;
     width: 80px;
     height: 60px;
     background-color: #FFECB3;
@@ -42,7 +42,7 @@ const RecipeBookButton = styled.div`
 const CraftPanel = styled.div`
     position: absolute;
     top: 75px;
-    right: 20px;
+    right: 15px;
     width: 400px;
     height: 200px;
     background-color: rgba(255, 255, 255, 0.9);

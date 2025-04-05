@@ -14,15 +14,14 @@ const CookingPot = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 5px;
 `;
 
 const PotContents = styled.div`
-    width: 80%;
-    height: 20px;
+    width: 100%;
+    height: 100%;
     background-color: ${props => props.color || '#FFF59D'};
-    border-radius: 5px;
-    position: relative;
-    top: 10px;
+    border-radius: 10px 10px 35px 35px;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -105,50 +105,11 @@ export const DiscoveryCounter = ({
     </DiscoveryCounterStyled>
 );
 
-// Current Recipe Display Component
-const CurrentRecipeDisplayStyled = styled(motion.div)`
-    position: absolute;
-    bottom: 20px;
-    left: 350px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 10px 15px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 25;
-`;
-
-const RecipeTitle = styled.div`
-    font-size: 14px;
-    font-weight: bold;
-    color: #5D4037;
-    margin-bottom: 5px;
-`;
-
-const RecipeEmoji = styled.div`
-    font-size: 24px;
-    margin-bottom: 5px;
-`;
-
-export const CurrentRecipeDisplay = ({ recipe }) => (
-    <CurrentRecipeDisplayStyled
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-    >
-        <RecipeTitle>Current Recipe:</RecipeTitle>
-        <RecipeEmoji>{recipe.emoji}</RecipeEmoji>
-        <RecipeTitle>{recipe.name}</RecipeTitle>
-    </CurrentRecipeDisplayStyled>
-);
-
 // Discovery Notification Component
 const DiscoveryNotificationStyled = styled(motion.div)`
     position: absolute;
     top: 15px;
-    left: 50%;
+    left: 42%;
     transform: translateX(-50%);
     background-color: rgba(76, 175, 80, 0.9);
     color: white;
@@ -208,8 +169,8 @@ export const RecipeInstructions = () => (
 // Combine Area Component
 const CombineAreaStyled = styled.div`
     position: absolute;
-    bottom: 320px;  // Adjusted from top: -90px
-    left: 550px;
+    bottom: 120px;
+    left: 280px;
     width: 250px;
     height: 80px;
     background-color: rgba(255, 255, 255, 0.9);
