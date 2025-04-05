@@ -1,12 +1,13 @@
-# React + Vite
+# 🧓🥫 Granny Mabel vs the World
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Granny Mabel vs the World** is an experimental narrative sandbox game that explores the deep and often invisible links between global economic policy and everyday life. Players shift between the intimate, hand-painted world of Grandma Mabel’s seaside food stand and a cold, abstract realm of global trade decisions. What happens in the tariff chamber echoes in Mabel’s world—one recipe, one relationship, one ripple at a time.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🔄 Two Worlds, One System
 
-## Expanding the ESLint configuration
+### 🏖 Grandma Mabel’s Shore  
+A cozy life sim where players cook and serve regulars in a small coastal town. Ingredient availability and community moods subtly shift based on global policy.
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🧮 The Tariff Chamber  
+A stark, data-driven interface where players experiment with tariffs, trade deals, and economic levers. No right answers—just cascading consequences.
