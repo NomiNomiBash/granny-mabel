@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Kitchen background (blurred) -->
+  <rect width="800" height="600" fill="#FFF8E1" opacity="0.3"/>
+  
+  <!-- Old CRT TV Frame -->
+  <rect x="150" y="50" width="500" height="450" rx="20" fill="#444444"/>
+  <rect x="170" y="80" width="460" height="350" rx="10" fill="#111111"/>
+  <!-- TV Screen -->
+  <rect x="175" y="85" width="450" height="340" fill="#222831"/>
+  
+  <!-- TV Controls -->
+  <circle cx="400" cy="460" r="15" fill="#333333" stroke="#555555" stroke-width="2"/>
+  <circle cx="350" cy="460" r="10" fill="#333333" stroke="#555555" stroke-width="2"/>
+  <circle cx="450" cy="460" r="10" fill="#333333" stroke="#555555" stroke-width="2"/>
+  
+  <!-- TV brand logo -->
+  <text x="250" cy="460" font-family="Arial" font-size="14" fill="#888888">RETROTV</text>
+  
+  <!-- News Broadcast Interface -->
+  <!-- News Channel Banner -->
+  <rect x="175" y="85" width="450" height="50" fill="#D32F2F"/>
+  <rect x="175" y="135" width="450" height="5" fill="#FFFFFF"/>
+  <text x="200" y="120" font-family="Arial" font-size="24" font-weight="bold" fill="#FFFFFF">BREAKING NEWS</text>
+  <circle cx="590" cy="110" r="15" fill="#FFFFFF"/>
+  <text x="585" y="117" font-family="Arial" font-size="18" font-weight="bold" fill="#D32F2F">24</text>
+  
+  <!-- News Ticker -->
+  <rect x="175" y="375" width="450" height="30" fill="#D32F2F"/>
+  <text x="200" y="395" font-family="Arial" font-size="14" fill="#FFFFFF">NEW TARIFFS ANNOUNCED • GLOBAL MARKETS RESPOND • TRADE TENSIONS ESCALATE • ECONOMIC IMPACT ANALYSIS</text>
+  
+  <!-- News Content Area -->
+  <rect x="175" y="140" width="450" height="235" fill="#ECF0F1"/>
+  
+  <!-- Split Screen Layout -->
+  <!-- News Anchor Box -->
+  <rect x="175" y="140" width="150" height="120" fill="#34495E"/>
+  <ellipse cx="240" cy="180" rx="30" ry="30" fill="#7F8C8D"/>
+  <rect x="210" y="210" width="60" height="40" fill="#7F8C8D"/>
+  
+  <!-- Main Story Graphics -->
+  <rect x="335" y="140" width="290" height="120" fill="#FFFFFF"/>
+  <text x="350" y="165" font-family="Arial" font-size="18" font-weight="bold" fill="#2C3E50">NEW TARIFF STRUCTURE</text>
+  
+  <!-- Tariff Information -->
+  <text x="350" y="190" font-family="Arial" font-size="14" fill="#2C3E50">• 10% baseline tariff on all imports</text>
+  <text x="350" y="210" font-family="Arial" font-size="14" fill="#2C3E50">• Custom rates for "worst offenders"</text>
+  <text x="350" y="230" font-family="Arial" font-size="14" fill="#2C3E50">• China: 54%, EU: 20%, Japan: 24%</text>
+  <text x="350" y="250" font-family="Arial" font-size="14" fill="#2C3E50">• Vietnam: 46%, Thailand: 36%</text>
+  
+  <!-- Countries Graphic -->
+  <rect x="175" y="270" width="450" height="105" fill="#FFFFFF"/>
+  
+  <!-- Country Flags (simplified) -->
+  <!-- China -->
+  <rect x="190" y="290" width="40" height="30" fill="#DE2910"/>
+  <text x="190" y="330" font-family="Arial" font-size="10" fill="#2C3E50">CHINA</text>
+  <text x="190" y="345" font-family="Arial" font-size="12" font-weight="bold" fill="#E74C3C">54%</text>
+  
+  <!-- EU -->
+  <rect x="250" y="290" width="40" height="30" fill="#003399"/>
+  <text x="250" y="330" font-family="Arial" font-size="10" fill="#2C3E50">EU</text>
+  <text x="250" y="345" font-family="Arial" font-size="12" font-weight="bold" fill="#E74C3C">20%</text>
+  
+  <!-- Vietnam -->
+  <rect x="310" y="290" width="40" height="30" fill="#DA251D"/>
+  <text x="310" y="330" font-family="Arial" font-size="10" fill="#2C3E50">VIETNAM</text>
+  <text x="310" y="345" font-family="Arial" font-size="12" font-weight="bold" fill="#E74C3C">46%</text>
+  
+  <!-- Japan -->
+  <rect x="370" y="290" width="40" height="30" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+  <circle cx="390" cy="305" r="10" fill="#BC002D"/>
+  <text x="370" y="330" font-family="Arial" font-size="10" fill="#2C3E50">JAPAN</text>
+  <text x="370" y="345" font-family="Arial" font-size="12" font-weight="bold" fill="#E74C3C">24%</text>
+  
+  <!-- Thailand -->
+  <rect x="430" y="290" width="40" height="30" fill="#FFFFFF"/>
+  <rect x="430" y="290" width="40" height="10" fill="#ED1C24"/>
+  <rect x="430" y="310" width="40" height="10" fill="#ED1C24"/>
+  <rect x="430" y="300" width="40" height="10" fill="#241D4F"/>
+  <text x="430" y="330" font-family="Arial" font-size="10" fill="#2C3E50">THAILAND</text>
+  <text x="430" y="345" font-family="Arial" font-size="12" font-weight="bold" fill="#E74C3C">36%</text>
+  
+  <!-- Network Logo -->
+  <rect x="565" y="345" width="50" height="20" fill="#D32F2F"/>
+  <text x="578" y="360" font-family="Arial" font-size="12" font-weight="bold" fill="#FFFFFF">NEWS</text>
+  
+  <!-- Current Time -->
+  <text x="565" y="330" font-family="Arial" font-size="12" fill="#7F8C8D">LIVE</text>
+  
+  <!-- Interactive Zoom Prompt -->
+  <rect x="350" y="210" width="100" height="40" rx="20" fill="rgba(52, 152, 219, 0.7)"/>
+  <text x="400" y="235" font-family="Arial" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">🔍 Zoom In</text>
+  
+  <!-- TV Static Effect -->
+  <rect x="175" y="85" width="450" height="340" fill="url(#tvStatic)" opacity="0.05"/>
+  
+  <!-- TV Glow -->
+  <rect x="175" y="85" width="450" height="340" fill="#FFFFFF" opacity="0.05"/>
+  
+  <!-- TV Scan Line Effect -->
+  <defs>
+    <pattern id="tvStatic" patternUnits="userSpaceOnUse" width="100" height="100">
+      <rect width="100" height="100" fill="#000000"/>
+      <rect x="0" y="0" width="50" height="50" fill="#FFFFFF" opacity="0.05"/>
+      <rect x="50" y="50" width="50" height="50" fill="#FFFFFF" opacity="0.05"/>
+    </pattern>
+    
+    <linearGradient id="scanLines" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  
+  <g opacity="0.3">
+    <rect x="175" y="85" width="450" height="2" fill="#FFFFFF">
+      <animate attributeName="y" from="85" to="425" dur="10s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <!-- Television reflection -->
+  <path d="M175,425 Q400,450 625,425" fill="#FFFFFF" opacity="0.1"/>
+</svg>
