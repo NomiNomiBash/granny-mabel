@@ -4,7 +4,7 @@ Granny Mabel vs the World is an experimental narrative sandbox game that explore
 
 ## 🔄 Two Worlds, One System
 	
-•	Grandma Mabel’s Shore
+- Grandma Mabel’s Shore
 A cozy life sim where players cook and serve regulars in a small coastal town. Ingredient availability and community moods subtly shift based on global policy.
-•	The Tariff Chamber
+- The Tariff Chamber
 A stark, data-driven interface where players experiment with tariffs, trade deals, and economic levers. No right answers—just cascading consequences.
