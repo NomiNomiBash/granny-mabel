@@ -9,9 +9,7 @@ import { RecipeBook } from '../components/kitchen/RecipeBook';
 import { TelevisionComponent } from '../components/kitchen/Television';
 import { InfiniteRecipes } from '../data/RecipeData';
 import {
-    IngredientRow,
     DiscoveryCounter,
-    CurrentRecipeDisplay,
     DiscoveryNotification,
     RecipeInstructions,
     CombineArea
@@ -27,10 +25,16 @@ function Kitchen() {
 
     // Ingredients state for infinite craft
     const [ingredientsDiscovered, setIngredientsDiscovered] = useState([
-        { id: 1, name: "Water", emoji: "💧", color: "#E3F2FD" },
-        { id: 2, name: "Fire", emoji: "🔥", color: "#FFCCBC" },
-        { id: 3, name: "Flour", emoji: "🌾", color: "#FFF9C4" },
-        { id: 4, name: "Salt", emoji: "🧂", color: "#F5F5F5" }
+        { id: 1, name: "Water", emoji: "💧", color: "#E3F2FD", category: "base" },
+        { id: 2, name: "Rice", emoji: "🍚", color: "#FFF9C4", category: "grain" },
+        { id: 3, name: "Wheat Flour", emoji: "🌾", color: "#F5F5F5", category: "grain" },
+        { id: 4, name: "Salt", emoji: "🧂", color: "#F0F0F0", category: "seasoning" },
+        { id: 5, name: "Vegetables", emoji: "🥬", color: "#E8F5E9", category: "produce" },
+        { id: 6, name: "Soy Sauce", emoji: "🥢", color: "#4A4A4A", category: "sauce" },
+        { id: 7, name: "Eggs", emoji: "🥚", color: "#FFF3E0", category: "protein" },
+        { id: 8, name: "Chicken", emoji: "🍗", color: "#FFEBEE", category: "protein" },
+        { id: 9, name: "Fruits", emoji: "🍎", color: "#FFE0B2", category: "produce" },
+        { id: 10, name: "Sugar", emoji: "🍬", color: "#FFFFFF", category: "seasoning" }
     ]);
 
     const [selectedIngredients, setSelectedIngredients] = useState([null, null]);
@@ -178,10 +182,6 @@ function Kitchen() {
                 showCraftPanel={showCraftPanel}
                 toggleCraftPanel={toggleCraftPanel}
             />
-
-            {potContent.name && (
-                <CurrentRecipeDisplay recipe={potContent} />
-            )}
 
             <AnimatePresence>
                 {newDiscovery && (
