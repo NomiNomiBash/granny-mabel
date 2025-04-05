@@ -74,125 +74,125 @@ const StickyNote = styled.div`
 `;
 
 const Kettle = styled.div`
-  position: absolute;
-  top: -50px;
-  left: 350px;
-  width: 60px;
-  height: 40px;
-  background-color: #757575;
-  border-radius: 10px 10px 0 0;
-  
-  &::before {
-    content: '';
     position: absolute;
-    top: -15px;
-    left: 25px;
-    width: 10px;
-    height: 15px;
+    top: -50px;
+    left: 350px;
+    width: 60px;
+    height: 40px;
     background-color: #757575;
-  }
+    border-radius: 10px 10px 0 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -15px;
+        left: 25px;
+        width: 10px;
+        height: 15px;
+        background-color: #757575;
+    }
 `;
 
 const SteamEffect = styled(motion.div)`
-  position: absolute;
-  top: -30px;
-  left: 30px;
-  width: 5px;
-  height: 20px;
-  background-color: white;
-  border-radius: 5px;
-  opacity: 0.7;
+    position: absolute;
+    top: -30px;
+    left: 30px;
+    width: 5px;
+    height: 20px;
+    background-color: white;
+    border-radius: 5px;
+    opacity: 0.7;
 `;
 
 const BreadLoaf = styled.div`
-  position: absolute;
-  top: -30px;
-  right: 100px;
-  width: 120px;
-  height: 40px;
-  background-color: #D4A76A;
-  border-radius: 20px;
+    position: absolute;
+    top: -30px;
+    right: 100px;
+    width: 120px;
+    height: 40px;
+    background-color: #D4A76A;
+    border-radius: 20px;
 `;
 
 const JamJars = styled.div`
-  position: absolute;
-  top: -40px;
-  right: 20px;
-  display: flex;
-  gap: 10px;
+    position: absolute;
+    top: -40px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
 `;
 
 const JamJar = styled.div`
-  width: 30px;
-  height: 40px;
-  background-color: ${props => props.color || '#D32F2F'};
-  border-radius: 5px 5px 10px 10px;
-  opacity: 0.8;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 0;
     width: 30px;
-    height: 5px;
-    background-color: #BDBDBD;
-  }
+    height: 40px;
+    background-color: ${props => props.color || '#D32F2F'};
+    border-radius: 5px 5px 10px 10px;
+    opacity: 0.8;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: 0;
+        width: 30px;
+        height: 5px;
+        background-color: #BDBDBD;
+    }
 `;
 
-const Television = styled.div`
-  position: absolute;
-  top: 275px;
-  left: 250px;
-  width: 150px;
-  height: 100px;
-  background-color: #212121;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+const Television = styled(motion.div)`
+    position: absolute;
+    top: 275px;
+    left: 250px;
+    width: 150px;
+    height: 100px;
+    background-color: #444444;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 `;
 
 const TVScreen = styled(motion.div)`
-  width: 130px;
-  height: 80px;
-  background-color: ${props => props.isOn ? '#4CA5FF' : '#263238'};
-  border-radius: 2px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+    width: 87%;
+    height: 78%;
+    background-color: ${props => props.isOn ? '#222831' : '#111111'};
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 `;
 
 const TVPrompt = styled(motion.div)`
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 14px;
-  cursor: pointer;
-  z-index: 5;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 5;
 `;
 
 const TVGlow = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
-  opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    opacity: 0;
 `;
 
 const TVTurnOnFlash = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: white;
-  opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: 0;
 `;
 
 function Kitchen() {
@@ -217,10 +217,10 @@ function Kitchen() {
         setShowPrompt(false);
         setTvOn(true);
 
-        // Navigate to TV News scene after brief animation
+        // Delay navigation to allow TV turn-on animation to complete
         setTimeout(() => {
             navigate('/tv');
-        }, 1000);
+        }, 800);
     };
 
     // Steam animation
@@ -264,7 +264,12 @@ function Kitchen() {
                 <StickyNote />
             </Refrigerator>
 
-            <Television>
+            <Television
+                animate={tvOn ? {
+                    scale: 1.05,
+                } : {}}
+                transition={{ duration: 0.5 }}
+            >
                 <TVScreen isOn={tvOn}>
                     {showPrompt && (
                         <TVPrompt
