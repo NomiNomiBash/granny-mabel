@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Dark abstract background -->
+  <rect width="800" height="600" fill="#0B0C10"/>
+  
+  <!-- Grid and techno patterns -->
+  <g opacity="0.15">
+    <!-- Horizontal lines -->
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="0" y1="400" x2="800" y2="400" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="0" y1="500" x2="800" y2="500" stroke="#66FCF1" stroke-width="1"/>
+    
+    <!-- Vertical lines -->
+    <line x1="100" y1="0" x2="100" y2="600" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="600" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="600" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="600" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="500" y1="0" x2="500" y2="600" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="600" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="600" stroke="#66FCF1" stroke-width="1"/>
+  </g>
+  
+  <!-- Glowing edging -->
+  <rect x="10" y="10" width="780" height="580" fill="none" stroke="#45A29E" stroke-width="2" rx="10" opacity="0.5"/>
+  
+  <!-- World Map Module -->
+  <rect x="50" y="50" width="250" height="180" rx="5" fill="#1F2833" stroke="#45A29E" stroke-width="2"/>
+  <text x="70" y="80" font-family="Arial" font-size="16" fill="#C5C6C7" font-weight="bold">Global Trade Map</text>
+  
+  <!-- Simplified World Map -->
+  <g transform="translate(70, 100)">
+    <!-- Continents - simplified shapes -->
+    <path d="M20,40 Q40,35 60,45 Q80,40 100,35 L120,25 Q140,30 160,40 L180,50" fill="none" stroke="#66FCF1" stroke-width="1.5"/>
+    <path d="M30,70 Q50,65 70,75 Q90,70 110,65 L130,55 Q150,60 170,70" fill="none" stroke="#66FCF1" stroke-width="1.5"/>
+    
+    <!-- Trade Routes -->
+    <path d="M40,40 C60,50 80,30 100,45" stroke="#45A29E" stroke-width="1" stroke-dasharray="2,2"/>
+    <path d="M120,35 C140,45 160,25 180,40" stroke="#45A29E" stroke-width="1" stroke-dasharray="2,2"/>
+    
+    <!-- Active Trade Spots -->
+    <circle cx="40" cy="40" r="3" fill="#FF4081"/>
+    <circle cx="100" cy="45" r="3" fill="#FF4081"/>
+    <circle cx="160" cy="25" r="3" fill="#FF4081"/>
+    
+    <!-- Vietnam pin (highlighted) -->
+    <circle cx="140" cy="65" r="5" fill="#E74C3C"/>
+    <text x="125" y="85" font-family="Arial" font-size="9" fill="#C5C6C7">Vietnam</text>
+    
+    <!-- USA (highlighted for tariffs) -->
+    <circle cx="60" cy="50" r="5" fill="#3498DB"/>
+    <text x="50" y="40" font-family="Arial" font-size="9" fill="#C5C6C7">USA</text>
+    
+    <!-- Tariff Effect Visualization -->
+    <path d="M60,50 C80,20 120,30 140,65" stroke="#E74C3C" stroke-width="2" stroke-dasharray="4,2"/>
+    
+    <!-- Activity pulse on trade route -->
+    <circle cx="100" cy="40" r="10" fill="#E74C3C" opacity="0.2">
+      <animate attributeName="r" values="5;15;5" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Forecast Module -->
+  <rect x="50" y="250" width="250" height="180" rx="5" fill="#1F2833" stroke="#45A29E" stroke-width="2"/>
+  <text x="70" y="280" font-family="Arial" font-size="16" fill="#C5C6C7" font-weight="bold">Trade Forecast</text>
+  
+  <!-- Chart in Forecast Module -->
+  <g transform="translate(70, 300)">
+    <!-- Axes -->
+    <line x1="0" y1="100" x2="200" y2="100" stroke="#66FCF1" stroke-width="1"/>
+    <line x1="0" y1="0" x2="0" y2="100" stroke="#66FCF1" stroke-width="1"/>
+    
+    <!-- Y-axis labels -->
+    <text x="-5" y="20" font-family="Arial" font-size="8" fill="#66FCF1" text-anchor="end">High</text>
+    <text x="-5" y="60" font-family="Arial" font-size="8" fill="#66FCF1" text-anchor="end">Med</text>
+    <text x="-5" y="100" font-family="Arial" font-size="8" fill="#66FCF1" text-anchor="end">Low</text>
+    
+    <!-- X-axis labels -->
+    <text x="0" y="115" font-family="Arial" font-size="8" fill="#66FCF1">Now</text>
+    <text x="100" y="115" font-family="Arial" font-size="8" fill="#66FCF1">6 mo</text>
+    <text x="200" y="115" font-family="Arial" font-size="8" fill="#66FCF1">1 yr</text>
+    
+    <!-- Forecast Lines -->
+    <path d="M0,50 L40,35 L80,45 L120,20 L160,40 L200,15" stroke="#FF4081" stroke-width="2" fill="none"/>
+    <text x="210" y="15" font-family="Arial" font-size="8" fill="#FF4081">EU</text>
+    
+    <path d="M0,60 L40,70 L80,80 L120,85 L160,75 L200,80" stroke="#3498DB" stroke-width="2" fill="none"/>
+    <text x="210" y="80" font-family="Arial" font-size="8" fill="#3498DB">US</text>
+    
+    <path d="M0,40 L40,50 L80,60 L120,70 L160,80 L200,60" stroke="#E74C3C" stroke-width="2" fill="none"/>
+    <text x="210" y="60" font-family="Arial" font-size="8" fill="#E74C3C">Asia</text>
+    
+    <!-- Event markers -->
+    <circle cx="80" cy="45" r="4" fill="#FFC107"/>
+    <text x="75" y="35" font-family="Arial" font-size="8" fill="#FFC107">Tariff</text>
+    <text x="75" y="45" font-family="Arial" font-size="8" fill="#FFC107">Impact</text>
+  </g>
+  
+  <!-- Control Panel Module -->
+  <rect x="320" y="50" width="430" height="380" rx="5" fill="#1F2833" stroke="#45A29E" stroke-width="2"/>
+  <text x="350" y="80" font-family="Arial" font-size="20" fill="#C5C6C7" font-weight="bold">Tariff Control Chamber</text>
+  
+  <!-- Sliders Section -->
+  <text x="350" y="115" font-family="Arial" font-size="14" fill="#C5C6C7">Trade Policy Controls</text>
+  
+  <!-- Tariff Rate Slider -->
+  <text x="350" y="145" font-family="Arial" font-size="14" fill="#C5C6C7">Seafood Imports</text>
+  <rect x="350" y="155" width="350" height="10" rx="5" fill="#0B0C10"/>
+  <rect x="350" y="155" width="200" height="10" rx="5" fill="#66FCF1"/>
+  <circle cx="550" cy="160" r="10" fill="#45A29E"/>
+  <text x="705" y="160" font-family="Arial" font-size="12" fill="#66FCF1" text-anchor="end">57%</text>
+  
+  <!-- Agricultural Subsidies Slider -->
+  <text x="350" y="195" font-family="Arial" font-size="14" fill="#C5C6C7">Agricultural Subsidies</text>
+  <rect x="350" y="205" width="350" height="10" rx="5" fill="#0B0C10"/>
+  <rect x="350" y="205" width="280" height="10" rx="5" fill="#66FCF1"/>
+  <circle cx="630" cy="210" r="10" fill="#45A29E"/>
+  <text x="705" y="210" font-family="Arial" font-size="12" fill="#66FCF1" text-anchor="end">80%</text>
+  
+  <!-- Trade Agreements Slider -->
+  <text x="350" y="245" font-family="Arial" font-size="14" fill="#C5C6C7">Trade Agreements</text>
+  <rect x="350" y="255" width="350" height="10" rx="5" fill="#0B0C10"/>
+  <rect x="350" y="255" width="105" height="10" rx="5" fill="#66FCF1"/>
+  <circle cx="455" cy="260" r="10" fill="#45A29E"/>
+  <text x="705" y="260" font-family="Arial" font-size="12" fill="#66FCF1" text-anchor="end">30%</text>
+  
+  <!-- Impact Display -->
+  <text x="350" y="295" font-family="Arial" font-size="14" fill="#C5C6C7">Economic Impact Analysis</text>
+  
+  <!-- Radar Chart / Spider Graph -->
+  <g transform="translate(525, 370)">
+    <!-- Background circles -->
+    <circle cx="0" cy="0" r="70" fill="none" stroke="#45A29E" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="0" cy="0" r="50" fill="none" stroke="#45A29E" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="0" cy="0" r="30" fill="none" stroke="#45A29E" stroke-width="0.5" opacity="0.3"/>
+    
+    <!-- Axes -->
+    <line x1="0" y1="0" x2="0" y2="-70" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="0" x2="70" y2="0" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="0" x2="0" y2="70" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="0" x2="-70" y2="0" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="0" x2="49.5" y2="-49.5" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="0" x2="49.5" y2="49.5" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="0" x2="-49.5" y2="49.5" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="0" x2="-49.5" y2="-49.5" stroke="#45A29E" stroke-width="0.5" opacity="0.5"/>
+    
+    <!-- Labels -->
+    <text x="0" y="-80" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="middle">GDP</text>
+    <text x="80" y="0" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="start">Exports</text>
+    <text x="0" y="80" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="middle">Jobs</text>
+    <text x="-80" y="0" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="end">Imports</text>
+    <text x="60" y="-60" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="middle">Inflation</text>
+    <text x="60" y="60" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="middle">Local Business</text>
+    <text x="-60" y="60" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="middle">Consumer Prices</text>
+    <text x="-60" y="-60" font-family="Arial" font-size="10" fill="#C5C6C7" text-anchor="middle">Food Security</text>
+    
+    <!-- Current Impact Shape -->
+    <path d="M0,-45 L60,5 L0,40 L-50,-5 L-40,-50 L0,-45" fill="#45A29E" fill-opacity="0.3" stroke="#66FCF1" stroke-width="2"/>
+    
+    <!-- Impact Points -->
+    <circle cx="0" cy="-45" r="4" fill="#66FCF1"/>
+    <circle cx="60" cy="5" r="4" fill="#66FCF1"/>
+    <circle cx="0" cy="40" r="4" fill="#66FCF1"/>
+    <circle cx="-50" cy="-5" r="4" fill="#66FCF1"/>
+    <circle cx="-40" cy="-50" r="4" fill="#66FCF1"/>
+  </g>
+  
+  <!-- Country Data Panel - Vietnam -->
+  <rect x="360" y="310" width="150" height="130" fill="#0B0C10" stroke="#45A29E" stroke-width="1"/>
+  <text x="370" y="330" font-family="Arial" font-size="12" fill="#C5C6C7" font-weight="bold">Vietnam Trade Status</text>
+  
+  <text x="370" y="355" font-family="Arial" font-size="10" fill="#C5C6C7">Tariff Rate: 46%</text>
+  <rect x="370" y="365" width="130" height="5" rx="2" fill="#1F2833"/>
+  <rect x="370" y="365" width="60" height="5" rx="2" fill="#E74C3C"/>
+  
+  <text x="370" y="385" font-family="Arial" font-size="10" fill="#C5C6C7">Seafood Exports: ▼23%</text>
+  <rect x="370" y="395" width="130" height="5" rx="2" fill="#1F2833"/>
+  <rect x="370" y="395" width="90" height="5" rx="2" fill="#3498DB"/>
+  
+  <text x="370" y="415" font-family="Arial" font-size="10" fill="#C5C6C7">Market Access: Limited</text>
+  <rect x="370" y="425" width="130" height="5" rx="2" fill="#1F2833"/>
+  <rect x="370" y="425" width="40" height="5" rx="2" fill="#FFC107"/>
+  
+  <!-- Welcome Banner / Instructions -->
+  <rect x="200" y="500" width="400" height="70" rx="35" fill="rgba(69,162,158,0.2)" stroke="#45A29E" stroke-width="2"/>
+  <text x="400" y="530" font-family="Arial" font-size="16" fill="#66FCF1" text-anchor="middle" font-weight="bold">Welcome to the Tariff Chamber</text>
+  <text x="400" y="555" font-family="Arial" font-size="14" fill="#C5C6C7" text-anchor="middle">Adjust trade levers to observe the effects on global economies</text>
+  
+  <!-- ESC Prompt -->
+  <rect x="50" y="450" width="180" height="40" rx="20" fill="rgba(69,162,158,0.2)" stroke="#45A29E" stroke-width="1"/>
+  <text x="80" y="475" font-family="Arial" font-size="14" fill="#C5C6C7">Press ESC to return</text>
+  
+  <!-- Glowing Effects -->
+  <circle cx="550" cy="160" r="15" fill="#45A29E" opacity="0.3"/>
+  <circle cx="630" cy="210" r="15" fill="#45A29E" opacity="0.3"/>
+  <circle cx="455" cy="260" r="15" fill="#45A29E" opacity="0.3"/>
+  
+  <!-- Data Flow Visualization -->
+  <g opacity="0.7">
+    <path d="M300,150 C310,160 320,140 330,150" stroke="#66FCF1" stroke-width="1" opacity="0.5">
+      <animate attributeName="d" values="M300,150 C310,160 320,140 330,150; M300,150 C310,140 320,160 330,150; M300,150 C310,160 320,140 330,150" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M300,200 C310,210 320,190 330,200" stroke="#66FCF1" stroke-width="1" opacity="0.5">
+      <animate attributeName="d" values="M300,200 C310,210 320,190 330,200; M300,200 C310,190 320,210 330,200; M300,200 C310,210 320,190 330,200" dur="4s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>

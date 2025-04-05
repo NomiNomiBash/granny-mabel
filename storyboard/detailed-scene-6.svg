@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background - Kitchen walls -->
+  <rect width="800" height="600" fill="#FFF8E1"/>
+  
+  <!-- Wooden floor -->
+  <rect y="500" width="800" height="100" fill="#A1887F"/>
+  
+  <!-- Window with seaside view -->
+  <rect x="550" y="100" width="200" height="250" rx="5" fill="#AED6F1"/>
+  <rect x="560" y="110" width="180" height="230" rx="3" fill="#5DADE2"/>
+  
+  <!-- Window frame -->
+  <line x1="650" y1="110" x2="650" y2="340" stroke="#8D6E63" stroke-width="5"/>
+  <line x1="560" y1="225" x2="740" y2="225" stroke="#8D6E63" stroke-width="5"/>
+  <rect x="550" y="100" width="200" height="250" rx="5" fill="none" stroke="#8D6E63" stroke-width="8"/>
+  
+  <!-- Sea and sky view -->
+  <rect x="560" y="225" width="180" height="115" fill="#1A5276"/>
+  <rect x="560" y="110" width="180" height="115" fill="#5DADE2"/>
+  
+  <!-- Grandma silhouette looking out window -->
+  <g transform="translate(650, 190)">
+    <!-- Head -->
+    <circle cx="0" cy="0" r="15" fill="#5D4037"/>
+    <!-- Body -->
+    <rect x="-15" y="15" width="30" height="40" fill="#5D4037"/>
+    <!-- Arm pointing -->
+    <rect x="15" y="20" width="20" height="5" fill="#5D4037" transform="rotate(20 15 20)"/>
+  </g>
+  
+  <!-- Clouds -->
+  <ellipse cx="600" cy="140" rx="25" ry="15" fill="#ECF0F1"/>
+  <ellipse cx="630" cy="150" rx="30" ry="12" fill="#ECF0F1"/>
+  <ellipse cx="700" cy="160" rx="20" ry="10" fill="#ECF0F1"/>
+  
+  <!-- Seagulls -->
+  <path d="M580,180 C585,175 590,180 595,175 C600,180 605,175 610,180" fill="none" stroke="#17202A" stroke-width="2"/>
+  <path d="M680,190 C685,185 690,190 695,185 C700,190 705,185 710,190" fill="none" stroke="#17202A" stroke-width="2"/>
+  
+  <!-- Kitchen counter -->
+  <rect x="50" y="350" width="700" height="150" fill="#D7CCC8"/>
+  <rect x="50" y="375" width="700" height="125" fill="#8D6E63"/>
+  
+  <!-- Wall cabinets -->
+  <rect x="100" y="100" width="400" height="150" fill="#D7CCC8"/>
+  <line x1="300" y1="100" x2="300" y2="250" stroke="#A1887F" stroke-width="3"/>
+  <rect x="130" y="130" width="140" height="90" fill="#A1887F" rx="2"/>
+  <rect x="330" y="130" width="140" height="90" fill="#A1887F" rx="2"/>
+  <circle cx="250" cy="175" r="5" fill="#E0E0E0"/>
+  <circle cx="450" cy="175" r="5" fill="#E0E0E0"/>
+  
+  <!-- Refrigerator -->
+  <rect x="100" y="275" width="120" height="220" rx="5" fill="#ECEFF1"/>
+  <rect x="100" y="275" width="120" height="30" fill="#CFD8DC"/>
+  <line x1="160" y1="275" x2="160" y2="495" stroke="#CFD8DC" stroke-width="2"/>
+  <rect x="110" y="285" width="40" height="10" rx="2" fill="#B0BEC5"/>
+  
+  <!-- IMPORTANT CHANGE: Sticky note about no prawns -->
+  <rect x="130" y="325" width="80" height="60" fill="#FFF59D" transform="rotate(5 130 325)"/>
+  <text x="140" y="345" font-family="Arial" font-size="8" fill="#333" font-weight="bold">NO PRAWNS</text>
+  <text x="140" y="360" font-family="Arial" font-size="8" fill="#333">at the market</text>
+  <text x="140" y="375" font-family="Arial" font-size="8" fill="#333">today</text>
+  
+  <!-- Other postcards on fridge -->
+  <rect x="120" y="395" width="70" height="50" fill="#BBDEFB" transform="rotate(-3 120 395)"/>
+  <rect x="145" y="445" width="60" height="40" fill="#FFCCBC" transform="rotate(2 145 445)"/>
+  
+  <!-- Kettle on stove -->
+  <rect x="350" y="350" width="150" height="25" fill="#424242"/>
+  <circle cx="425" cy="362" r="50" fill="#616161"/>
+  <ellipse cx="425" cy="335" rx="35" ry="15" fill="#9E9E9E"/>
+  <ellipse cx="425" cy="335" rx="25" ry="10" fill="#424242"/>
+  <rect x="410" y="295" width="10" height="40" fill="#757575"/>
+  <rect x="460" y="315" width="30" height="10" fill="#9E9E9E" rx="3"/>
+  
+  <!-- Kettle whistling - ACTIVE -->
+  <path d="M425,290 C435,275 415,270 425,260 C435,250 415,245 425,235" stroke="#E0E0E0" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.7">
+    <animate attributeName="d" 
+             values="M425,290 C435,275 415,270 425,260 C435,250 415,245 425,235;
+                    M425,290 C415,275 435,270 425,260 C415,250 435,245 425,235" 
+             dur="2s" 
+             repeatCount="indefinite"/>
+  </path>
+  <path d="M435,295 C445,280 425,275 435,265 C445,255 425,250 435,240" stroke="#E0E0E0" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.5">
+    <animate attributeName="d" 
+             values="M435,295 C445,280 425,275 435,265 C445,255 425,250 435,240;
+                    M435,295 C425,280 445,275 435,265 C425,255 445,250 435,240" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+  </path>
+  
+  <!-- Bread loaf -->
+  <ellipse cx="600" cy="370" rx="60" ry="25" fill="#D4A76A"/>
+  <ellipse cx="600" cy="365" rx="58" ry="22" fill="#E6C899"/>
+  <line x1="570" y1="362" x2="630" y2="362" stroke="#C49A6C" stroke-width="0.5"/>
+  <line x1="565" y1="368" x2="635" y2="368" stroke="#C49A6C" stroke-width="0.5"/>
+  
+  <!-- Jars of jam -->
+  <circle cx="670" cy="410" r="20" fill="#D32F2F" opacity="0.8"/>
+  <rect x="650" y="390" width="40" height="10" fill="#BDBDBD"/>
+  <circle cx="720" cy="405" r="18" fill="#7B1FA2" opacity="0.8"/>
+  <rect x="702" y="387" width="36" height="8" fill="#BDBDBD"/>
+  
+  <!-- IMPORTANT CHANGE: Empty seafood basket -->
+  <g transform="translate(250, 400)">
+    <!-- Basket shape - empty -->
+    <ellipse cx="0" cy="0" rx="50" ry="20" fill="none" stroke="#8D6E63" stroke-width="2"/>
+    <path d="M-50,0 C-40,15 40,15 50,0" fill="none" stroke="#8D6E63" stroke-width="2"/>
+    <path d="M-40,-5 L-40,10" stroke="#8D6E63" stroke-width="1"/>
+    <path d="M-20,-5 L-20,10" stroke="#8D6E63" stroke-width="1"/>
+    <path d="M0,-5 L0,10" stroke="#8D6E63" stroke-width="1"/>
+    <path d="M20,-5 L20,10" stroke="#8D6E63" stroke-width="1"/>
+    <path d="M40,-5 L40,10" stroke="#8D6E63" stroke-width="1"/>
+    
+    <!-- Small label on basket -->
+    <rect x="-20" y="-15" width="40" height="10" fill="#FFE0B2" rx="2"/>
+    <text x="0" y="-7" font-family="Arial" font-size="6" fill="#5D4037" text-anchor="middle">SEAFOOD</text>
+  </g>
+  
+  <!-- Kitchen table (partial) -->
+  <rect x="50" y="550" width="300" height="50" fill="#795548"/>
+  <rect x="75" y="500" width="15" height="50" fill="#5D4037"/>
+  <rect x="310" y="500" width="15" height="50" fill="#5D4037"/>
+  
+  <!-- TV on the wall - now OFF -->
+  <rect x="250" y="275" width="150" height="100" rx="5" fill="#212121"/>
+  <rect x="260" y="285" width="130" height="80" fill="#263238"/>
+  
+  <!-- Small decorative elements -->
+  <rect x="150" y="550" width="80" height="5" fill="#D7CCC8"/>
+  <rect x="170" y="540" width="40" height="10" fill="#A1887F"/>
+  
+  <!-- Calendar on wall -->
+  <rect x="520" y="40" width="80" height="50" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="1"/>
+  <line x1="520" y1="60" x2="600" y2="60" stroke="#BDBDBD" stroke-width="1"/>
+  <text x="560" y="55" font-family="Arial" font-size="10" fill="#333333" text-anchor="middle">APRIL</text>
+  <text x="560" y="75" font-family="Arial" font-size="14" fill="#E74C3C" text-anchor="middle" font-weight="bold">5</text>
+  <text x="560" y="90" font-family="Arial" font-size="7" fill="#333333" text-anchor="middle">Effective date of</text>
+  <text x="560" y="100" font-family="Arial" font-size="7" fill="#333333" text-anchor="middle">new tariffs</text>
+  
+  <!-- Wall clock -->
+  <circle cx="50" cy="50" r="30" fill="#ECEFF1" stroke="#757575" stroke-width="2"/>
+  <line x1="50" y1="50" x2="50" y2="30" stroke="#424242" stroke-width="2"/>
+  <line x1="50" y1="50" x2="65" y2="60" stroke="#424242" stroke-width="3"/>
+  
+  <!-- Ambient light effect -->
+  <rect width="800" height="600" fill="#FFA726" opacity="0.05"/>
+</svg>
