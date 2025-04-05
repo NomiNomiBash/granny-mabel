@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
-const ChamberContainer = styled.div`
+const ChamberContainer = styled(motion.div)`
   background-color: #0B0C10;
   height: 100vh;
   width: 100vw;
@@ -369,7 +369,11 @@ function TariffChamber({ gameState, setGameState }) {
     };
 
     return (
-        <ChamberContainer>
+        <ChamberContainer
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+        >
             {/* Background grid */}
             <Grid>
                 {horizontalGridLines}
