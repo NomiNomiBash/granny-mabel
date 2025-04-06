@@ -29,7 +29,7 @@ export const InfiniteRecipes = {
     "Chicken+Soy Sauce": { name: "Soy Glazed Chicken", emoji: "🍗", color: "#6D4C41", category: "protein" },
 
     // Complex Combinations
-    "Vegetable Noodles+Soy Sauce": { name: "Asian Veggie Noodles", emoji: "🍜", color: "#4CAF50", category: "noodles" },
+    "Vegetable Noodles+Soy Sauce": { name: "Soy Veggie Noodles", emoji: "🍜", color: "#4CAF50", category: "noodles" },
     "Chicken Noodle Soup+Vegetables": { name: "Hearty Chicken Soup", emoji: "🥣", color: "#FF9800", category: "soup" },
 
     // Unique Vietnamese-Inspired Recipes
