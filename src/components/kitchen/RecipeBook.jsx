@@ -44,7 +44,7 @@ const CraftPanel = styled.div`
     top: 75px;
     right: 15px;
     width: 400px;
-    height: 200px;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     padding: 15px;
@@ -81,9 +81,28 @@ const Ingredient = styled(motion.div)`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    cursor: grab;
+    cursor: ${props => props.scarce ? 'not-allowed' : 'grab'};
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     user-select: none;
+    opacity: ${props => props.scarce ? 0.5 : 1};
+    position: relative;
+`;
+
+const ScarcityOverlay = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    color: red;
+    font-weight: bold;
+    font-size: 10px;
+    z-index: 10;
 `;
 
 const IngredientIcon = styled.div`
@@ -109,18 +128,31 @@ const RecipeBookComponent = ({ onClick }) => (
 // Panel subcomponent
 const RecipeBookPanel = ({ ingredients, onIngredientClick }) => (
     <CraftPanel>
-        <PanelTitle>Grandma's Recipe Book <small style={{ fontSize: '12px' }}>(Click ingredients to use them)</small></PanelTitle>
+        <PanelTitle>
+            Grandma's Recipe Book <small style={{ fontSize: '12px' }}>
+            (Click ingredients to use them)
+        </small>
+        </PanelTitle>
         <IngredientGrid>
             {ingredients.map((ingredient) => (
                 <Ingredient
                     key={ingredient.id}
                     bgColor={ingredient.color}
-                    onClick={() => onIngredientClick(ingredient)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    scarce={ingredient.scarce}
+                    onClick={() => {
+                        // Only allow clicking if not scarce
+                        if (!ingredient.scarce) {
+                            onIngredientClick(ingredient);
+                        }
+                    }}
+                    whileHover={{ scale: ingredient.scarce ? 1 : 1.05 }}
+                    whileTap={{ scale: ingredient.scarce ? 1 : 0.95 }}
                 >
                     <IngredientIcon>{ingredient.emoji}</IngredientIcon>
                     <IngredientName>{ingredient.name}</IngredientName>
+                    {ingredient.scarce && (
+                        <ScarcityOverlay>Scarce</ScarcityOverlay>
+                    )}
                 </Ingredient>
             ))}
         </IngredientGrid>
