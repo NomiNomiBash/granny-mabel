@@ -72,6 +72,95 @@ export const IngredientRow = ({ baseIngredients, onIngredientClick, isrecentrow 
     </IngredientsRowStyled>
 );
 
+// Calendar Component
+const CalendarContainer = styled.div`
+    position: absolute;
+    top: 15px;
+    left: 310px;
+    width: 100px;
+    height: 50px;
+    background-color: white;
+    border: 1px solid #BDBDBD;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 5;
+`;
+
+const CalendarMonth = styled.div`
+    width: 100%;
+    height: 20px;
+    background-color: white;
+    border-bottom: 1px solid #BDBDBD;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: #333;
+`;
+
+const CalendarDay = styled.div`
+    font-size: 24px;
+    font-weight: bold;
+    color: #E74C3C;
+`;
+
+const CalendarNote = styled.div`
+    font-size: 12px;
+    font-weight: bold;
+    color: #E74C3C;
+    text-align: center;
+    margin-top: 2px;
+`;
+
+export const Calendar = ({ month, day, notes = [] }) => {
+    return (
+        <CalendarContainer>
+            <CalendarMonth>{month}</CalendarMonth>
+            <CalendarDay>{day}</CalendarDay>
+            {notes.map((note, index) => (
+                <CalendarNote key={index}>{note}</CalendarNote>
+            ))}
+        </CalendarContainer>
+    );
+};
+
+// Sticky Note Component
+const StickyNoteContainer = styled.div`
+    position: absolute;
+    bottom: 80px;
+    left: 45px;
+    width: 80px;
+    height: 60px;
+    background-color: #FFF59D;
+    transform: rotate(5deg);
+    padding: 5px;
+    z-index: 10;
+`;
+
+const StickyNoteTitle = styled.div`
+    font-weight: bold;
+    font-size: 10px;
+    margin-bottom: 5px;
+    color: #333;
+`;
+
+const StickyNoteText = styled.div`
+    font-size: 8px;
+    color: #333;
+`;
+
+export const StickyNote = ({ title, text = [] }) => {
+    return (
+        <StickyNoteContainer>
+            <StickyNoteTitle>{title}</StickyNoteTitle>
+            {text.map((line, index) => (
+                <StickyNoteText key={index}>{line}</StickyNoteText>
+            ))}
+        </StickyNoteContainer>
+    );
+};
+
 // Discovery Counter Component
 const DiscoveryCounterStyled = styled.div`
     position: absolute;
