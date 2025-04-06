@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import grannyImage from '../../assets/granny.png';
+import grannyArmImage from '../../assets/react.svg';
 
 const CookingPot = styled.div`
     position: absolute;
@@ -43,62 +45,35 @@ const SteamEffect = styled(motion.div)`
     opacity: 0.7;
 `;
 
-const Grandma = styled.div`
+const GrandmaContainer = styled.div`
     position: absolute;
-    bottom: 120px;  // Adjusted from top: -120px
-    left: 200px;
+    width: 600px;
+    bottom: 0;
+    right: 200px;
+    z-index: 5;
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 5;
 `;
 
-const GrandmaHead = styled.div`
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #FFE0B2;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: -15px;
-        left: 5px;
-        width: 50px;
-        height: 30px;
-        background-color: #E0E0E0; // Gray hair
-        border-radius: 50% 50% 0 0;
-    }
+const GrandmaImage = styled.img`
+    width: 600px;
+    height: auto;
 `;
 
-const GrandmaBody = styled.div`
-    width: 80px;
-    height: 100px;
-    background-color: #F06292; // Pink dress
-    border-radius: 20px 20px 0 0;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 30px;
-        left: 15px;
-        width: 50px;
-        height: 20px;
-        background-color: #FFFFFF; // White apron
-        border-radius: 5px;
-    }
-`;
-
-const GrandmaArm = styled(motion.div)`
+const StirringArm = styled(motion.img)`
     position: absolute;
-    top: 40px;
-    ${props => props.side === 'left' ? 'left: -10px;' : 'right: -10px;'}
-    width: 40px;
-    height: 10px;
-    background-color: #FFE0B2;
-    border-radius: 5px;
-    transform-origin: ${props => props.side === 'left' ? 'right' : 'left'} center;
+    bottom: 60px;
+    right: -40px;
+    width: 80px;
+    height: auto;
+    transform-origin: 20% 90%;
 `;
+
+// Fallback SVG for missing images
+const GRANDMA_FALLBACK_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='200' viewBox='0 0 150 200'%3E%3Crect width='150' height='200' fill='%23f0d0c0'/%3E%3Ccircle cx='75' cy='60' r='30' fill='%23ffe0b2'/%3E%3Crect x='45' y='95' width='60' height='80' fill='%23f06292'/%3E%3Crect x='55' y='85' width='40' height='20' fill='%23ffffff'/%3E%3C/svg%3E";
+
+const ARM_FALLBACK_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='30' viewBox='0 0 80 30'%3E%3Crect width='60' height='10' fill='%23ffe0b2' rx='5' ry='5'/%3E%3C/svg%3E";
 
 export const CookingArea = ({ potContent, isStirring }) => {
     // Steam animation
@@ -114,18 +89,24 @@ export const CookingArea = ({ potContent, isStirring }) => {
     };
 
     // Arm stirring animation
-    const armVariants = {
+    const stirringVariants = {
         stirring: {
-            rotate: [0, 30, 0, -30, 0],
+            rotate: [0, 20, 0, -20, 0],
             transition: {
                 repeat: Infinity,
-                duration: 2,
+                duration: 1.5,
                 ease: "easeInOut"
             }
         },
         idle: {
             rotate: 0
         }
+    };
+
+    // Function to handle image load errors
+    const handleImageError = (e, fallbackSvg) => {
+        console.error(`Failed to load image: ${e.target.src}`);
+        e.target.src = fallbackSvg;
     };
 
     return (
@@ -152,22 +133,20 @@ export const CookingArea = ({ potContent, isStirring }) => {
                 />
             </CookingPot>
 
-            <Grandma>
-                <GrandmaHead />
-                <GrandmaBody>
-                    <GrandmaArm
-                        side="left"
-                        variants={armVariants}
-                        animate={isStirring ? "stirring" : "idle"}
-                    />
-                    <GrandmaArm
-                        side="right"
-                        variants={armVariants}
-                        animate={isStirring ? "stirring" : "idle"}
-                        style={{ animationDelay: "0.5s" }}
-                    />
-                </GrandmaBody>
-            </Grandma>
+            <GrandmaContainer>
+                <GrandmaImage 
+                    src={grannyImage} 
+                    alt="Grandma" 
+                    onError={(e) => handleImageError(e, GRANDMA_FALLBACK_SVG)}
+                />
+                <StirringArm 
+                    src={grannyArmImage}
+                    alt="Grandma's Arm"
+                    variants={stirringVariants}
+                    animate={isStirring ? "stirring" : "idle"}
+                    onError={(e) => handleImageError(e, ARM_FALLBACK_SVG)}
+                />
+            </GrandmaContainer>
         </>
     );
 };
