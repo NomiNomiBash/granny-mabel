@@ -123,8 +123,8 @@ const SplitScreen = styled.div`
 `;
 
 const AnchorBox = styled.div`
-    width: 150px;
-    height: 120px;
+    width: 450px;
+    height: 300px;
     background-color: #34495E;
     position: relative;
 `;
@@ -175,7 +175,7 @@ const TariffItem = styled.li`
 `;
 
 const CountriesPanel = styled.div`
-    margin-top: 10px;
+    margin-top: 200px;
     background-color: white;
     padding: 10px;
     display: flex;
@@ -298,8 +298,8 @@ function TVNews() {
                 animate={{
                     top: '50%',
                     left: '50%',
-                    width: '500px',
-                    height: '450px',
+                    width: '70%',
+                    height: '100%',
                     borderRadius: '20px',
                     opacity: 1,
                     x: '-50%',
@@ -340,8 +340,6 @@ function TVNews() {
                                             <TariffList>
                                                 <TariffItem>10% baseline tariff on all imports</TariffItem>
                                                 <TariffItem>Custom rates for "worst offenders"</TariffItem>
-                                                <TariffItem>China: 54%, EU: 20%, Japan: 24%</TariffItem>
-                                                <TariffItem>Vietnam: 46%, Thailand: 36%</TariffItem>
                                             </TariffList>
                                         </MainStory>
                                     </SplitScreen>
