@@ -1,5 +1,5 @@
 // src/scenes/Kitchen.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,6 +7,7 @@ import { KitchenBackground } from '../components/kitchen/KitchenBackground';
 import { CookingArea } from '../components/kitchen/CookingArea';
 import { RecipeBook } from '../components/kitchen/RecipeBook';
 import { TelevisionComponent } from '../components/kitchen/Television';
+import KitchenAudio from '../components/kitchen/KitchenAudio';
 import { InfiniteRecipes } from '../data/RecipeData';
 import {
     DiscoveryCounter,
@@ -22,6 +23,8 @@ function Kitchen() {
     const [isStirring, setIsStirring] = useState(false);
     const [newDiscovery, setNewDiscovery] = useState(null);
     const [showCraftPanel, setShowCraftPanel] = useState(false);
+    const [audioEnabled, setAudioEnabled] = useState(true);
+    const audioTriggeredRef = useRef(false);
 
     // Ingredients state for infinite craft
     const [ingredientsDiscovered, setIngredientsDiscovered] = useState([
@@ -40,6 +43,29 @@ function Kitchen() {
     const [selectedIngredients, setSelectedIngredients] = useState([null, null]);
     const [potContent, setPotContent] = useState({ name: "", color: "#E3F2FD", emoji: "" });
 
+    // User interaction to enable audio
+    const enableAudio = () => {
+        if (!audioTriggeredRef.current) {
+            setAudioEnabled(true);
+            audioTriggeredRef.current = true;
+        }
+    };
+
+    // Listen for any user interaction to enable audio (browser policy)
+    useEffect(() => {
+        const handleUserInteraction = () => {
+            enableAudio();
+        };
+
+        window.addEventListener('click', handleUserInteraction);
+        window.addEventListener('keydown', handleUserInteraction);
+
+        return () => {
+            window.removeEventListener('click', handleUserInteraction);
+            window.removeEventListener('keydown', handleUserInteraction);
+        };
+    }, []);
+
     // Listen for E key press and R key press
     useEffect(() => {
         const handleKeyPress = (e) => {
@@ -47,6 +73,9 @@ function Kitchen() {
                 turnOnTV();
             } else if (e.key.toLowerCase() === 'r') {
                 setShowCraftPanel(prev => !prev);
+            } else if (e.key.toLowerCase() === 'm') {
+                // Toggle audio on/off with M key
+                setAudioEnabled(prev => !prev);
             }
         };
 
@@ -114,7 +143,8 @@ function Kitchen() {
                 id: ingredientsDiscovered.length + 1,
                 name: result.name,
                 emoji: result.emoji,
-                color: result.color
+                color: result.color,
+                category: result.category || "crafted"
             };
 
             if (!alreadyDiscovered) {
@@ -153,7 +183,17 @@ function Kitchen() {
     };
 
     return (
-        <KitchenContainer>
+        <KitchenContainer onClick={enableAudio}>
+            {/* Audio component */}
+            <KitchenAudio
+                isStirring={isStirring}
+                potContent={potContent}
+                newDiscovery={newDiscovery}
+                showCraftPanel={showCraftPanel}
+                tvOn={tvOn}
+                isMuted={!audioEnabled}
+            />
+
             <KitchenBackground />
             <CookingArea
                 potContent={potContent}
@@ -174,7 +214,13 @@ function Kitchen() {
                 />
             )}
 
-            {/* Rest of the components remain the same */}
+            {/* Sound toggle button */}
+            <SoundToggle
+                onClick={() => setAudioEnabled(prev => !prev)}
+            >
+                {audioEnabled ? '🔊' : '🔇'}
+            </SoundToggle>
+
             <DiscoveryCounter
                 discoveries={ingredientsDiscovered.length}
                 totalPossible={Object.keys(InfiniteRecipes).length + 4}
@@ -199,6 +245,34 @@ function Kitchen() {
         </KitchenContainer>
     );
 }
+
+// Sound toggle button component
+const SoundToggle = styled.button`
+    position: absolute;
+    top: 150px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+    }
+    
+    &:active {
+        transform: scale(0.95);
+    }
+`;
 
 // Keep the main container here for cleaner imports
 const KitchenContainer = styled.div`
