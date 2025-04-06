@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import anchorImage from '../assets/chihuahua.png'; // Update this path
 
 const TVContainer = styled.div`
     width: 100vw;
@@ -118,7 +119,6 @@ const NewsTickerText = styled(motion.div)`
 
 const SplitScreen = styled.div`
     display: flex;
-    height: 120px;
     gap: 10px;
 `;
 
@@ -131,23 +131,11 @@ const AnchorBox = styled.div`
 
 const AnchorFigure = styled.div`
     position: absolute;
-    width: 60px;
-    height: 100px;
-    top: 10px;
+    width: 450px;
     left: 45px;
-`;
-
-const AnchorHead = styled.div`
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #7F8C8D;
-`;
-
-const AnchorBody = styled.div`
-    width: 60px;
-    height: 40px;
-    background-color: #7F8C8D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 const MainStory = styled.div`
@@ -175,7 +163,7 @@ const TariffItem = styled.li`
 `;
 
 const CountriesPanel = styled.div`
-    margin-top: 200px;
+    margin-left: 50%;
     background-color: white;
     padding: 10px;
     display: flex;
@@ -330,8 +318,15 @@ function TVNews() {
                                     <SplitScreen>
                                         <AnchorBox>
                                             <AnchorFigure>
-                                                <AnchorHead />
-                                                <AnchorBody />
+                                                <img
+                                                    src={anchorImage}
+                                                    alt="News Anchor"
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '100%',
+                                                        objectFit: 'contain'
+                                                    }}
+                                                />
                                             </AnchorFigure>
                                         </AnchorBox>
 
