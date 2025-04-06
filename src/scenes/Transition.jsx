@@ -5,253 +5,202 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 const TransitionContainer = styled.div`
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  background-color: #0B0C10;
-  overflow: hidden;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0B0C10;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `;
 
-const KitchenFadeOut = styled(motion.div)`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: #FFF8E1;
-  opacity: 0.3;
-  filter: blur(8px);
-`;
-
-const GridLines = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  
-  &::before, &::after {
-    content: '';
+const KitchenBackground = styled(motion.div)`
     position: absolute;
-    background: #66FCF1;
-    opacity: 0.15;
-  }
-  
-  /* Horizontal lines */
-  &::before {
-    top: ${props => props.index * 100}px;
-    left: 0;
     width: 100%;
-    height: 1px;
-  }
-  
-  /* Vertical lines */
-  &::after {
-    top: 0;
-    left: ${props => props.index * 100}px;
-    width: 1px;
     height: 100%;
-  }
+    background-color: #FFF8E1;
+    z-index: 1;
 `;
 
-const NewsAnchor = styled(motion.div)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px;
-  height: 250px;
+const DigitalOverlay = styled(motion.div)`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(69, 162, 158, 0.2) 0%, rgba(11, 12, 16, 0.9) 70%);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
-const AnchorHead = styled(motion.div)`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: #7F8C8D;
-  margin: 0 auto;
+const GridContainer = styled(motion.div)`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    opacity: 0;
 `;
 
-const AnchorBody = styled(motion.div)`
-  width: 120px;
-  height: 140px;
-  background-color: #7F8C8D;
-  margin: 0 auto;
-  margin-top: 10px;
+const GridLine = styled.div`
+    position: absolute;
+    background-color: #66FCF1;
+    opacity: 0.15;
+
+    &.horizontal {
+        height: 1px;
+        width: 100%;
+        left: 0;
+    }
+
+    &.vertical {
+        width: 1px;
+        height: 100%;
+        top: 0;
+    }
 `;
 
-const WireframeLines = styled(motion.path)`
-  fill: none;
-  stroke: #4FC3F7;
-  stroke-width: 1;
+const TransitionMessage = styled(motion.div)`
+    z-index: 4;
+    color: #66FCF1;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    max-width: 80%;
 `;
 
-const DataLine = styled(motion.path)`
-  fill: none;
-  stroke-width: 2;
+const LoadingBar = styled(motion.div)`
+    width: 400px;
+    height: 8px;
+    background-color: #1F2833;
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 4;
 `;
 
-const InterfaceUIContainer = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
+const LoadingProgress = styled(motion.div)`
+    height: 100%;
+    background-color: #66FCF1;
 `;
 
-const Panel = styled(motion.div)`
-  position: absolute;
-  background-color: #1F2833;
-  border: 2px solid #45A29E;
-  border-radius: 5px;
-  opacity: 0;
+const TariffPanel = styled(motion.div)`
+    margin-top: 50px;
+    background-color: #1F2833;
+    border: 2px solid #45A29E;
+    border-radius: 5px;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    z-index: 4;
+    opacity: 0;
 `;
 
-const WorldMapPanel = styled(Panel)`
-  top: 50px;
-  left: 50px;
-  width: 250px;
-  height: 180px;
+const PanelTitle = styled.h2`
+    color: #C5C6C7;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
 `;
 
-const ControlPanel = styled(Panel)`
-  top: 50px;
-  right: 50px;
-  width: 430px;
-  height: 380px;
-`;
-
-const ForecastPanel = styled(Panel)`
-  bottom: 50px;
-  left: 50px;
-  width: 250px;
-  height: 180px;
+const PanelDescription = styled.p`
+    color: #C5C6C7;
+    text-align: center;
+    margin-bottom: 20px;
 `;
 
 function Transition() {
     const navigate = useNavigate();
 
-    // Auto-navigate to the Tariff Chamber after animation completes
+    // Auto-navigate after animation completes
     useEffect(() => {
         const timer = setTimeout(() => {
             navigate('/tariff-chamber');
-        }, 5000); // 5 seconds for the full transition
+        }, 5000);
 
         return () => clearTimeout(timer);
     }, [navigate]);
 
-    // Create multiple grid lines
-    const gridLines = [];
-    for (let i = 0; i < 10; i++) {
-        gridLines.push(
-            <GridLines
-                key={i}
-                index={i}
-                animate={{ opacity: 0.3 }}
-                transition={{ delay: 1 + (i * 0.1), duration: 0.5 }}
+    // Create grid lines
+    const horizontalGridLines = [];
+    const verticalGridLines = [];
+
+    for (let i = 1; i < 10; i++) {
+        horizontalGridLines.push(
+            <GridLine
+                key={`h-${i}`}
+                className="horizontal"
+                style={{ top: `${i * 100}px` }}
+            />
+        );
+    }
+
+    for (let i = 1; i < 12; i++) {
+        verticalGridLines.push(
+            <GridLine
+                key={`v-${i}`}
+                className="vertical"
+                style={{ left: `${i * 100}px` }}
             />
         );
     }
 
     return (
         <TransitionContainer>
-            {/* Kitchen fading out */}
-            <KitchenFadeOut
-                initial={{ opacity: 0.7 }}
-                animate={{ opacity: 0, filter: 'blur(20px)' }}
-                transition={{ duration: 3 }}
+            {/* Kitchen background fading out */}
+            <KitchenBackground
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 2 }}
+            />
+
+            {/* Digital world fading in */}
+            <DigitalOverlay
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 2, delay: 0.5 }}
             />
 
             {/* Grid appearing */}
-            {gridLines}
-
-            {/* News anchor transforming to wireframe */}
-            <NewsAnchor
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 0 }}
-                transition={{ delay: 2.5, duration: 1 }}
-            >
-                <AnchorHead />
-                <AnchorBody />
-            </NewsAnchor>
-
-            {/* Wireframe appearing */}
-            <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
-                <g transform="translate(400, 300)">
-                    <WireframeLines
-                        d="M0,-50 L-30,-10 L30,-10 Z"  // Head
-                        initial={{ opacity: 0, pathLength: 0 }}
-                        animate={{ opacity: 1, pathLength: 1 }}
-                        transition={{ delay: 2, duration: 1.5 }}
-                    />
-
-                    <WireframeLines
-                        d="M0,-10 L0,50"  // Body
-                        initial={{ opacity: 0, pathLength: 0 }}
-                        animate={{ opacity: 1, pathLength: 1 }}
-                        transition={{ delay: 2.2, duration: 1.5 }}
-                    />
-
-                    <WireframeLines
-                        d="M0,0 L-30,30 M0,0 L30,30"  // Arms
-                        initial={{ opacity: 0, pathLength: 0 }}
-                        animate={{ opacity: 1, pathLength: 1 }}
-                        transition={{ delay: 2.4, duration: 1.5 }}
-                    />
-
-                    <WireframeLines
-                        d="M-40,-30 L-20,-40 L20,-40 L40,-30 L40,30 L20,40 L-20,40 L-40,30 Z"  // Screen
-                        initial={{ opacity: 0, pathLength: 0 }}
-                        animate={{ opacity: 1, pathLength: 1 }}
-                        transition={{ delay: 2.6, duration: 1.5 }}
-                    />
-                </g>
-
-                {/* Data visualization lines appearing */}
-                <DataLine
-                    d="M100,400 Q200,350 300,400 Q400,450 500,400 Q600,350 700,400"
-                    stroke="#00BCD4"
-                    initial={{ opacity: 0, pathLength: 0 }}
-                    animate={{ opacity: 1, pathLength: 1 }}
-                    transition={{ delay: 3, duration: 1.5 }}
-                />
-
-                <DataLine
-                    d="M100,300 Q200,350 300,300 Q400,250 500,300 Q600,350 700,300"
-                    stroke="#FFC107"
-                    initial={{ opacity: 0, pathLength: 0 }}
-                    animate={{ opacity: 1, pathLength: 1 }}
-                    transition={{ delay: 3.3, duration: 1.5 }}
-                />
-
-                <DataLine
-                    d="M100,200 Q200,150 300,200 Q400,250 500,200 Q600,150 700,200"
-                    stroke="#FF4081"
-                    initial={{ opacity: 0, pathLength: 0 }}
-                    animate={{ opacity: 1, pathLength: 1 }}
-                    transition={{ delay: 3.6, duration: 1.5 }}
-                />
-            </svg>
-
-            {/* Interface UI appearing */}
-            <InterfaceUIContainer
+            <GridContainer
                 animate={{ opacity: 1 }}
-                transition={{ delay: 3.8, duration: 1 }}
+                transition={{ duration: 1, delay: 2 }}
             >
-                <WorldMapPanel
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 4, duration: 0.5 }}
-                />
+                {horizontalGridLines}
+                {verticalGridLines}
+            </GridContainer>
 
-                <ControlPanel
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 4.2, duration: 0.5 }}
-                />
+            {/* Clear message about what's happening */}
+            <TransitionMessage
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 1 }}
+            >
+                Entering Global Trade Simulation
+            </TransitionMessage>
 
-                <ForecastPanel
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 4.4, duration: 0.5 }}
+            {/* Loading bar for visual feedback */}
+            <LoadingBar>
+                <LoadingProgress
+                    initial={{ width: 0 }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: 4 }}
                 />
-            </InterfaceUIContainer>
+            </LoadingBar>
+
+            {/* Tariff chamber preview */}
+            <TariffPanel
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 2.5 }}
+            >
+                <PanelTitle>Tariff Control Chamber</PanelTitle>
+                <PanelDescription>
+                    Adjust global trade policies and observe their effects on international economies.
+                    Your decisions will impact global trade patterns and food distribution.
+                </PanelDescription>
+            </TariffPanel>
         </TransitionContainer>
     );
 }
