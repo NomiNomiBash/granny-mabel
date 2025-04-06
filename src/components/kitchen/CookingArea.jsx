@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import grannyImage from '../../assets/granny.png';
-import grannyArmImage from '../../assets/react.svg';
+import grannyArmImage from '../../assets/granny_arm.png';
 
 const CookingPot = styled.div`
     position: absolute;
@@ -64,8 +64,8 @@ const GrandmaImage = styled.img`
 const StirringArm = styled(motion.img)`
     position: absolute;
     bottom: 60px;
-    right: -40px;
-    width: 80px;
+    right: -100px;
+    width: 300px;
     height: auto;
     transform-origin: 20% 90%;
 `;
