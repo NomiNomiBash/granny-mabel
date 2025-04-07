@@ -23,8 +23,8 @@ Follow these steps to get Granny Mabel vs the World running on your local machin
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/NomiNomiBash/granny-mabel-vs-the-world.git
-   cd granny-mabel-vs-the-world
+   git clone https://github.com/NomiNomiBash/granny-mabel.git
+   cd granny-mabel
    ```
 
 2. **Install dependencies**
