@@ -34,7 +34,44 @@ const AUDIO_FILES = {
         type: 'ui',
         volume: 0.7
     },
-    // Keep your other audio definitions here...
+    // New techno music for TV scene
+    TECHNO_MUSIC: {
+        id: 'techno',
+        url: '/src/assets/techbrotechno.wav', // Update this with your actual techno music file path
+        type: 'loop',
+        volume: 0.5
+    },
+    // Add these to the AUDIO_FILES constant in GlobalAudio.js
+    GRANDMA_FAIL_1: {
+        id: 'grandma_fail_1',
+        url: '/src/assets/after/grandma_craft_fail_1.mp3',
+        type: 'ui',
+        volume: 1.0
+    },
+    GRANDMA_FAIL_2: {
+        id: 'grandma_fail_2',
+        url: '/src/assets/after/grandma_craft_fail_2.mp3',
+        type: 'ui',
+        volume: 1.0
+    },
+    GRANDMA_FAIL_3: {
+        id: 'grandma_fail_3',
+        url: '/src/assets/after/grandma_craft_fail_3.mp3',
+        type: 'ui',
+        volume: 1.0
+    },
+    GRANDMA_FAIL_4: {
+        id: 'grandma_fail_4',
+        url: '/src/assets/after/grandma_craft_fail_4.mp3',
+        type: 'ui',
+        volume: 1.0
+    },
+    GRANDMA_FAIL_5: {
+        id: 'grandma_fail_5',
+        url: '/src/assets/after/grandma_craft_fail_5.mp3',
+        type: 'ui',
+        volume: 1.0
+    },
 };
 
 /**
@@ -63,6 +100,9 @@ class GlobalAudio {
 
         // Keep track of loaded sound IDs
         this.loadedSoundIds = [];
+
+        // Current scene
+        this.currentScene = 'kitchen';
     }
 
     // Initialize the audio system - call this once at app startup
@@ -96,7 +136,6 @@ class GlobalAudio {
     }
 
     // Unlock audio playback on iOS and other restrictive browsers
-    // Unlock audio playback on iOS and other restrictive browsers
     unlockAudio() {
         // Create a very short audio buffer (0.1 seconds of silence)
         try {
@@ -128,12 +167,47 @@ class GlobalAudio {
         // Load background music and ambient sounds first
         const essentialSounds = [
             AUDIO_FILES.PIANO_MUSIC,
-            AUDIO_FILES.OCEAN_WAVES
+            AUDIO_FILES.OCEAN_WAVES,
+            AUDIO_FILES.UI_CLICK,
+            AUDIO_FILES.TECHNO_MUSIC // Preload techno music
         ];
 
         essentialSounds.forEach(sound => {
             this.loadSound(sound.id, sound.url);
         });
+    }
+
+    // Set current scene and adjust audio accordingly
+    setScene(sceneName) {
+        console.log(`[GlobalAudio] Switching to scene: ${sceneName}`);
+        this.currentScene = sceneName;
+
+        // Change background music based on scene
+        if (sceneName === 'tvnews') {
+            // Pause kitchen music
+            if (this.isLoopActive('piano')) {
+                this.stopLoop('piano');
+            }
+            if (this.isLoopActive('ocean')) {
+                this.stopLoop('ocean');
+            }
+
+            // Start techno music
+            this.startLoop('techno', 0.5);
+        } else if (sceneName === 'kitchen') {
+            // Pause techno music if it's playing
+            if (this.isLoopActive('techno')) {
+                this.stopLoop('techno');
+            }
+
+            // Start kitchen music if not already playing
+            if (!this.isLoopActive('piano')) {
+                this.startLoop('piano', 0.4);
+            }
+            if (!this.isLoopActive('ocean')) {
+                this.startLoop('ocean', 0.2);
+            }
+        }
     }
 
     // Resolve file path consistently
@@ -429,8 +503,6 @@ class GlobalAudio {
         });
     }
 
-    // Add these methods to your GlobalAudio.js file
-
     /**
      * Helper method to play UI click sound
      * @param {number} volume Volume for the click (default: 0.6)
@@ -461,7 +533,7 @@ class GlobalAudio {
      * @param {number} volume - Volume for the sound effect
      */
     playUISound(type, volume) {
-        if (this.isMuted) return false;
+        if (this.masterVolume === 0) return false;
 
         switch (type.toLowerCase()) {
             case 'book':

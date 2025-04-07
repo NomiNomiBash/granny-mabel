@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import anchorImage from '../assets/chihuahua.png'; // Update this path
+import globalAudio from '../utils/GlobalAudio'; // Import global audio
 
 const TVContainer = styled.div`
     width: 100vw;
@@ -55,6 +56,15 @@ const TVControl = styled.div`
     border-radius: 50%;
     background-color: #333333;
     border: 2px solid #555555;
+    cursor: pointer; /* Add cursor pointer for interactive feel */
+
+    &:hover {
+        background-color: #444444; /* Hover effect */
+    }
+
+    &:active {
+        background-color: #222222; /* Active effect */
+    }
 `;
 
 const TVBrand = styled.div`
@@ -175,6 +185,11 @@ const Country = styled.div`
     flex-direction: column;
     align-items: center;
     width: 60px;
+    cursor: pointer; /* Add cursor pointer for interaction */
+
+    &:hover {
+        transform: scale(1.05); /* Add subtle hover effect */
+    }
 `;
 
 const CountryFlag = styled.div`
@@ -239,6 +254,22 @@ function TVNews() {
     const [showContent, setShowContent] = useState(false);
     const [scanLinePosition, setScanLinePosition] = useState(0);
 
+    // Set up audio when component mounts
+    useEffect(() => {
+        // Tell the audio system we're in the TV News scene
+        globalAudio.setScene('tvnews');
+
+        return () => {
+            // Clean up function when leaving the scene
+            // We don't need to stop techno music as the Kitchen component will handle that
+        };
+    }, []);
+
+    // Add click sound to interactions
+    const playClickSound = () => {
+        globalAudio.playUIClick(0.5);
+    };
+
     // Update TV content timing
     useEffect(() => {
         // Show content after a brief delay to allow for position animation to start
@@ -267,7 +298,18 @@ function TVNews() {
 
     // Handle zoom in click
     const handleZoomClick = () => {
+        playClickSound(); // Play click sound
         navigate('/transition');
+    };
+
+    // Handle TV control clicks
+    const handleTVControlClick = () => {
+        playClickSound(); // Play click sound
+    };
+
+    // Handle country click
+    const handleCountryClick = () => {
+        playClickSound(); // Play click sound
     };
 
     return (
@@ -340,25 +382,25 @@ function TVNews() {
                                     </SplitScreen>
 
                                     <CountriesPanel>
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag color="#DE2910" />
                                             <CountryName>CHINA</CountryName>
                                             <CountryRate>54%</CountryRate>
                                         </Country>
 
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag color="#003399" />
                                             <CountryName>EU</CountryName>
                                             <CountryRate>20%</CountryRate>
                                         </Country>
 
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag color="#DA251D" />
                                             <CountryName>VIETNAM</CountryName>
                                             <CountryRate>46%</CountryRate>
                                         </Country>
 
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag color="#FFFFFF" style={{ border: '1px solid black' }}>
                                                 <div style={{
                                                     width: '20px',
@@ -372,7 +414,7 @@ function TVNews() {
                                             <CountryRate>24%</CountryRate>
                                         </Country>
 
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag style={{
                                                 display: 'flex',
                                                 flexDirection: 'column',
@@ -426,9 +468,9 @@ function TVNews() {
                 </TVScreen>
 
                 <TVControls>
-                    <TVControl />
-                    <TVControl $main={true} />
-                    <TVControl />
+                    <TVControl onClick={handleTVControlClick} />
+                    <TVControl $main={true} onClick={handleTVControlClick} />
+                    <TVControl onClick={handleTVControlClick} />
                 </TVControls>
 
                 <TVBrand>RETROTV</TVBrand>
