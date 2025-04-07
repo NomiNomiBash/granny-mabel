@@ -1,103 +1,8 @@
 // src/components/kitchen/KitchenAudio.jsx
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAudio } from '../../utils/AudioManager';
+import { useEffect, useRef } from 'react';
+import globalAudio from '../../utils/GlobalAudio';
 
-// List of all audio files to be used in the kitchen scene
-const AUDIO_FILES = {
-    // Background loops
-    PIANO_MUSIC: {
-        id: 'piano',
-        url: '/src/assets/pianomusic.wav',
-        type: 'loop',
-        volume: 0.4
-    },
-    OCEAN_WAVES: {
-        id: 'ocean',
-        url: '/src/assets/ES_Small Waves, Ocean, Beach, Crickets - Epidemic Sound.wav',
-        type: 'loop',
-        volume: 0.2
-    },
-    CURLEW_WAVES: {
-        id: 'curlew',
-        url: '/src/assets/ES_Snipes, Curlew Calling, Crickets, Waves In Background - Epidemic Sound.wav',
-        type: 'ambient',
-        volume: 0.3
-    },
-
-    // Grandma sound effects
-    GRANDMA_HMM: {
-        id: 'grandma_hmm',
-        url: '/src/assets/soundbites/grandma_hmm.mp3',
-        type: 'reaction',
-        volume: 1.0
-    },
-    GRANDMA_HAHA: {
-        id: 'grandma_haha',
-        url: '/src/assets/soundbites/grandma_ahaha.mp3', // Fixed name: ahaha not haha
-        type: 'reaction',
-        volume: 1.0
-    },
-    GRANDMA_MMM: {
-        id: 'grandma_mmm',
-        url: '/src/assets/soundbites/grandma_mmm.mp3',
-        type: 'reaction',
-        volume: 1.0
-    },
-    GRANDMA_MMHMM: {
-        id: 'grandma_mmhmm',
-        url: '/src/assets/soundbites/grandma_mmhmm.mp3',
-        type: 'reaction',
-        volume: 1.0
-    },
-
-    // Crafting success lines
-    GRANDMA_CRAFT_SUCCESS_1: {
-        id: 'grandma_success_1',
-        url: '/src/assets/before/grandma_craft_success_1.mp3',
-        type: 'craft',
-        volume: 1.0
-    },
-    GRANDMA_CRAFT_SUCCESS_2: {
-        id: 'grandma_success_2',
-        url: '/src/assets/before/grandma_craft_success_2.mp3',
-        type: 'craft',
-        volume: 1.0
-    },
-    GRANDMA_CRAFT_SUCCESS_3: {
-        id: 'grandma_success_3',
-        url: '/src/assets/before/grandma_craft_success_3.mp3',
-        type: 'craft',
-        volume: 1.0
-    },
-    GRANDMA_CRAFT_SUCCESS_4: {
-        id: 'grandma_success_4',
-        url: '/src/assets/before/grandma_craft_success_4.mp3',
-        type: 'craft',
-        volume: 1.0
-    },
-    GRANDMA_CRAFT_SUCCESS_5: {
-        id: 'grandma_success_5',
-        url: '/src/assets/before/grandma_craft_success_5.mp3',
-        type: 'craft',
-        volume: 1.0
-    },
-
-    // UI sounds
-    UI_CLICK: {
-        id: 'ui_click',
-        url: '/src/assets/ui_click.wav', // Changed to an existing file for UI click
-        type: 'ui',
-        volume: 0.6
-    },
-    UI_PAGE_TURN: {
-        id: 'ui_page_turn',
-        url: '/src/assets/ui_page_turn.wav', // Changed to an existing file for page turn
-        type: 'ui',
-        volume: 0.7
-    }
-};
-
-// Main KitchenAudio component
+// KitchenAudio component - redesigned to work with global audio system
 const KitchenAudio = ({
                           isStirring = false,
                           potContent = null,
@@ -106,254 +11,343 @@ const KitchenAudio = ({
                           tvOn = false,
                           isMuted = false
                       }) => {
-    const {
-        isReady,
-        loadedSounds,
-        loadSound,
-        playSound,
-        startLoop,
-        stopLoop,
-        setLoopVolume,
-        isSoundLoaded
-    } = useAudio();
-
-    const [localIsMuted, setLocalIsMuted] = useState(isMuted);
-    const ambientSoundTimerRef = useRef(null);
-    const grandmaReactionTimerRef = useRef(null);
+    // Keep track of previous state to detect changes
     const prevShowCraftPanelRef = useRef(showCraftPanel);
     const prevNewDiscoveryRef = useRef(newDiscovery);
+    const prevTvOnRef = useRef(tvOn);
+    const prevIsMutedRef = useRef(isMuted);
 
-    // Flag to track loading attempts
-    const [loadingAttempted, setLoadingAttempted] = useState(false);
+    // Refs for timers
+    const ambientSoundTimerRef = useRef(null);
+    const grandmaReactionTimerRef = useRef(null);
 
-    // Track active loops to ensure they're properly managed
-    const activeLoopsRef = useRef({
-        piano: false,
-        ocean: false
-    });
+    // These refs track if we've started our setup
+    const setupDoneRef = useRef(false);
+    const backgroundStartedRef = useRef(false);
 
-    // Update local mute state when prop changes
+    // Track if a success sound is currently playing
+    const successSoundPlayingRef = useRef(false);
+    const successSoundTimeoutRef = useRef(null);
+
+    // Track if reaction has played initially
+    const initialReactionPlayedRef = useRef(false);
+    const initialReactionTimeoutRef = useRef(null);
+
+    // Audio file IDs
+    const AUDIO_IDS = {
+        PIANO: 'piano',
+        OCEAN: 'ocean',
+        CURLEW: 'curlew',
+        UI_CLICK: 'ui_click',
+        UI_PAGE_TURN: 'ui_page_turn',
+
+        // Grandma sounds
+        GRANDMA_HMM: 'grandma_hmm',
+        GRANDMA_HAHA: 'grandma_haha',
+        GRANDMA_MMM: 'grandma_mmm',
+        GRANDMA_MMHMM: 'grandma_mmhmm',
+
+        // Craft success sounds
+        GRANDMA_SUCCESS_1: 'grandma_success_1',
+        GRANDMA_SUCCESS_2: 'grandma_success_2',
+        GRANDMA_SUCCESS_3: 'grandma_success_3',
+        GRANDMA_SUCCESS_4: 'grandma_success_4',
+        GRANDMA_SUCCESS_5: 'grandma_success_5',
+    };
+
+    // Helper to play a grandma reaction sound
+    const playGrandmaReaction = () => {
+        if (isMuted || successSoundPlayingRef.current) return false;
+
+        const reactionSounds = [
+            AUDIO_IDS.GRANDMA_HMM,
+            AUDIO_IDS.GRANDMA_HAHA,
+            AUDIO_IDS.GRANDMA_MMM,
+            AUDIO_IDS.GRANDMA_MMHMM
+        ];
+
+        const loadedReactions = reactionSounds.filter(id =>
+            globalAudio.isSoundLoaded(id)
+        );
+
+        if (loadedReactions.length > 0) {
+            const randomIndex = Math.floor(Math.random() * loadedReactions.length);
+            const soundId = loadedReactions[randomIndex];
+            console.log(`[KitchenAudio] Playing grandma reaction sound: ${soundId}`);
+            // Increase volume to make sure we hear it
+            globalAudio.playSound(soundId, 1.0);
+            return true;
+        }
+
+        return false;
+    };
+
+    // Initial setup - runs only once
     useEffect(() => {
-        setLocalIsMuted(isMuted);
+        if (setupDoneRef.current) return;
 
-        // If mute status changes, update all active loops
-        if (isReady && loadingAttempted) {
-            Object.entries(activeLoopsRef.current).forEach(([id, isActive]) => {
-                if (isActive) {
-                    if (isMuted) {
-                        stopLoop(id);
-                        activeLoopsRef.current[id] = false;
-                    } else {
-                        const soundConfig = Object.values(AUDIO_FILES).find(audio => audio.id === id);
-                        if (soundConfig) {
-                            startLoop(id, soundConfig.volume);
-                            activeLoopsRef.current[id] = true;
+        console.log("[KitchenAudio] Initial setup");
+        setupDoneRef.current = true;
+
+        // Listen for sounds being loaded
+        const handleSoundLoaded = (event) => {
+            console.log(`[KitchenAudio] Sound loaded: ${event.id}`);
+
+            // Start background loops once sounds are loaded
+            startBackgroundIfReady();
+
+            // Schedule an initial reaction sound soon after sounds are loaded
+            if (!initialReactionPlayedRef.current &&
+                (event.id === AUDIO_IDS.GRANDMA_HMM ||
+                    event.id === AUDIO_IDS.GRANDMA_HAHA ||
+                    event.id === AUDIO_IDS.GRANDMA_MMM ||
+                    event.id === AUDIO_IDS.GRANDMA_MMHMM)) {
+
+                if (initialReactionTimeoutRef.current) {
+                    clearTimeout(initialReactionTimeoutRef.current);
+                }
+
+                initialReactionTimeoutRef.current = setTimeout(() => {
+                    if (!initialReactionPlayedRef.current && !isMuted) {
+                        console.log("[KitchenAudio] Playing initial grandma reaction");
+                        if (playGrandmaReaction()) {
+                            initialReactionPlayedRef.current = true;
                         }
                     }
-                }
-            });
-        }
-    }, [isMuted, isReady, loadingAttempted, startLoop, stopLoop]);
-
-    // Load all audio files when component mounts - with graceful fallback
-    useEffect(() => {
-        if (isReady && !loadingAttempted) {
-            setLoadingAttempted(true);
-
-            console.log("Attempting to load audio files for kitchen scene...");
-
-            // Try to load sounds individually to allow partial success
-            Object.values(AUDIO_FILES).forEach(audio => {
-                // Check if already loaded first
-                if (!isSoundLoaded(audio.id)) {
-                    loadSound(audio.id, audio.url).catch(err => {
-                        console.warn(`Audio file ${audio.id} could not be loaded, continuing without this sound`);
-                    });
-                }
-            });
-        }
-    }, [isReady, loadSound, loadingAttempted, isSoundLoaded]);
-
-    // Start background loops for any successfully loaded sounds
-    useEffect(() => {
-        // Only proceed if we've attempted loading and audio is ready
-        if (!isReady || !loadingAttempted || localIsMuted) return;
-
-        // Check which background sounds loaded successfully
-        const pianoLoaded = loadedSounds.includes(AUDIO_FILES.PIANO_MUSIC.id);
-        const oceanLoaded = loadedSounds.includes(AUDIO_FILES.OCEAN_WAVES.id);
-
-        // Start any successful background loops
-        if (pianoLoaded && !activeLoopsRef.current.piano) {
-            startLoop(AUDIO_FILES.PIANO_MUSIC.id, AUDIO_FILES.PIANO_MUSIC.volume);
-            activeLoopsRef.current.piano = true;
-        }
-
-        if (oceanLoaded && !activeLoopsRef.current.ocean) {
-            startLoop(AUDIO_FILES.OCEAN_WAVES.id, AUDIO_FILES.OCEAN_WAVES.volume);
-            activeLoopsRef.current.ocean = true;
-        }
-
-        // Only start timers if we have the relevant sounds and they aren't already running
-        if (loadedSounds.includes(AUDIO_FILES.CURLEW_WAVES.id) && !ambientSoundTimerRef.current) {
-            startAmbientSoundTimer();
-        }
-
-        if ((loadedSounds.includes(AUDIO_FILES.GRANDMA_HMM.id) ||
-                loadedSounds.includes(AUDIO_FILES.GRANDMA_HAHA.id)) &&
-            !grandmaReactionTimerRef.current) {
-            startGrandmaReactionTimer();
-        }
-
-        // Return cleanup function
-        return () => {
-            // Clear timers when component unmounts
-            if (ambientSoundTimerRef.current) {
-                clearInterval(ambientSoundTimerRef.current);
-                ambientSoundTimerRef.current = null;
-            }
-            if (grandmaReactionTimerRef.current) {
-                clearInterval(grandmaReactionTimerRef.current);
-                grandmaReactionTimerRef.current = null;
-            }
-
-            // Stop all loops this component started
-            if (activeLoopsRef.current.piano) {
-                stopLoop(AUDIO_FILES.PIANO_MUSIC.id);
-            }
-            if (activeLoopsRef.current.ocean) {
-                stopLoop(AUDIO_FILES.OCEAN_WAVES.id);
+                }, 3000); // Play an initial reaction soon after loading
             }
         };
-    }, [loadedSounds, localIsMuted, loadingAttempted, isReady, startLoop, stopLoop]);
 
-    // Play ambient curlew sounds periodically
-    const startAmbientSoundTimer = useCallback(() => {
+        globalAudio.addEventListener('soundLoaded', handleSoundLoaded);
+
+        return () => {
+            globalAudio.removeEventListener('soundLoaded', handleSoundLoaded);
+            cleanupTimers();
+        };
+    }, [isMuted]);
+
+    // Function to start background sounds if ready
+    const startBackgroundIfReady = () => {
+        // Don't restart if already started or if muted
+        if (backgroundStartedRef.current || isMuted) return;
+
+        const pianoLoaded = globalAudio.isSoundLoaded(AUDIO_IDS.PIANO);
+        const oceanLoaded = globalAudio.isSoundLoaded(AUDIO_IDS.OCEAN);
+
+        if (pianoLoaded && !globalAudio.isLoopActive(AUDIO_IDS.PIANO)) {
+            console.log("[KitchenAudio] Starting piano background");
+            globalAudio.startLoop(AUDIO_IDS.PIANO, 0.4);
+        }
+
+        if (oceanLoaded && !globalAudio.isLoopActive(AUDIO_IDS.OCEAN)) {
+            console.log("[KitchenAudio] Starting ocean background");
+            globalAudio.startLoop(AUDIO_IDS.OCEAN, 0.2);
+        }
+
+        // If we've started at least one background sound, consider it started
+        if ((pianoLoaded && globalAudio.isLoopActive(AUDIO_IDS.PIANO)) ||
+            (oceanLoaded && globalAudio.isLoopActive(AUDIO_IDS.OCEAN))) {
+            backgroundStartedRef.current = true;
+
+            // Start timers for ambient sounds
+            startAmbientSoundTimer();
+            startGrandmaReactionTimer();
+        }
+    };
+
+    // Clean up timers
+    const cleanupTimers = () => {
+        if (ambientSoundTimerRef.current) {
+            clearInterval(ambientSoundTimerRef.current);
+            ambientSoundTimerRef.current = null;
+        }
+
+        if (grandmaReactionTimerRef.current) {
+            clearInterval(grandmaReactionTimerRef.current);
+            grandmaReactionTimerRef.current = null;
+        }
+
+        if (successSoundTimeoutRef.current) {
+            clearTimeout(successSoundTimeoutRef.current);
+            successSoundTimeoutRef.current = null;
+        }
+
+        if (initialReactionTimeoutRef.current) {
+            clearTimeout(initialReactionTimeoutRef.current);
+            initialReactionTimeoutRef.current = null;
+        }
+    };
+
+    // Start ambient sound timer (curlew sounds)
+    const startAmbientSoundTimer = () => {
         if (ambientSoundTimerRef.current) {
             clearInterval(ambientSoundTimerRef.current);
         }
 
         const timer = setInterval(() => {
-            if (!localIsMuted) {
-                const curlew = AUDIO_FILES.CURLEW_WAVES;
-                if (loadedSounds.includes(curlew.id)) {
-                    // 30% chance to play the sound
-                    if (Math.random() < 0.3) {
-                        playSound(curlew.id, curlew.volume);
-                    }
+            if (!isMuted && globalAudio.isSoundLoaded(AUDIO_IDS.CURLEW)) {
+                // 30% chance to play the sound
+                if (Math.random() < 0.3) {
+                    globalAudio.playSound(AUDIO_IDS.CURLEW, 0.3);
                 }
             }
-        }, 30000); // Check every 30 seconds
+        }, 20000); // Check every 20 seconds
 
         ambientSoundTimerRef.current = timer;
-    }, [loadedSounds, localIsMuted, playSound]);
+    };
 
-    // Play grandma reaction sounds periodically
-    const startGrandmaReactionTimer = useCallback(() => {
+    // Start grandma reaction timer - now with a faster interval
+    const startGrandmaReactionTimer = () => {
         if (grandmaReactionTimerRef.current) {
             clearInterval(grandmaReactionTimerRef.current);
         }
 
-        const timer = setInterval(() => {
-            if (localIsMuted) return;
-
-            const reactionSounds = [
-                AUDIO_FILES.GRANDMA_HMM,
-                AUDIO_FILES.GRANDMA_HAHA
-            ];
-
-            const loadedReactions = reactionSounds.filter(sound =>
-                loadedSounds.includes(sound.id)
-            );
-
-            if (loadedReactions.length > 0) {
-                // 20% chance to play a random reaction
-                if (Math.random() < 0.2) {
-                    const randomIndex = Math.floor(Math.random() * loadedReactions.length);
-                    const sound = loadedReactions[randomIndex];
-                    playSound(sound.id, sound.volume);
+        // Play the first reaction sound immediately
+        if (!initialReactionPlayedRef.current && !isMuted && !successSoundPlayingRef.current) {
+            setTimeout(() => {
+                if (playGrandmaReaction()) {
+                    initialReactionPlayedRef.current = true;
                 }
+            }, 1000);
+        }
+
+        const timer = setInterval(() => {
+            // Skip if muted or if a success sound is currently playing
+            if (isMuted || successSoundPlayingRef.current) return;
+
+            // 50% chance to play a reaction sound
+            if (Math.random() < 0.5) {
+                playGrandmaReaction();
+            } else {
+                console.log("[KitchenAudio] Random chance didn't trigger sound this time");
             }
-        }, 10000); // Check every 10 seconds
+        }, 5000); // Check every 5 seconds
 
         grandmaReactionTimerRef.current = timer;
-    }, [loadedSounds, localIsMuted, playSound]);
+    };
 
-    // Play success sound when a new discovery is made
+    // Effect for handling mute state changes
+    useEffect(() => {
+        // Only act on state change, not initial render
+        if (prevIsMutedRef.current !== isMuted && prevIsMutedRef.current !== undefined) {
+            console.log(`[KitchenAudio] Mute state changed: ${isMuted}`);
+
+            // If unmuting, try to start background
+            if (!isMuted) {
+                startBackgroundIfReady();
+            } else {
+                // If muting, stop all loops
+                globalAudio.stopLoop(AUDIO_IDS.PIANO);
+                globalAudio.stopLoop(AUDIO_IDS.OCEAN);
+
+                // Clear reference so we can restart later
+                backgroundStartedRef.current = false;
+            }
+        }
+
+        // Update the ref for next render
+        prevIsMutedRef.current = isMuted;
+    }, [isMuted]);
+
+    // Effect for handling new discovery (plays success sound)
     useEffect(() => {
         // Only play sound when discovery state changes from false to true
-        if (
-            newDiscovery &&
-            !prevNewDiscoveryRef.current &&
-            !localIsMuted &&
-            loadingAttempted
-        ) {
+        if (newDiscovery && !prevNewDiscoveryRef.current && !isMuted) {
             const craftSounds = [
-                AUDIO_FILES.GRANDMA_CRAFT_SUCCESS_1,
-                AUDIO_FILES.GRANDMA_CRAFT_SUCCESS_2,
-                AUDIO_FILES.GRANDMA_CRAFT_SUCCESS_3
+                AUDIO_IDS.GRANDMA_SUCCESS_1,
+                AUDIO_IDS.GRANDMA_SUCCESS_2,
+                AUDIO_IDS.GRANDMA_SUCCESS_3,
+                AUDIO_IDS.GRANDMA_SUCCESS_4,
+                AUDIO_IDS.GRANDMA_SUCCESS_5
             ];
 
-            const loadedCraftSounds = craftSounds.filter(sound =>
-                loadedSounds.includes(sound.id)
+            const loadedCraftSounds = craftSounds.filter(id =>
+                globalAudio.isSoundLoaded(id)
             );
 
             if (loadedCraftSounds.length > 0) {
                 const randomIndex = Math.floor(Math.random() * loadedCraftSounds.length);
-                const sound = loadedCraftSounds[randomIndex];
-                playSound(sound.id, sound.volume);
+                const soundId = loadedCraftSounds[randomIndex];
+
+                // Mark that a success sound is playing to prevent reaction sounds
+                successSoundPlayingRef.current = true;
+
+                // Play the success sound
+                globalAudio.playSound(soundId, 1.0);
+                console.log(`[KitchenAudio] Playing success sound: ${soundId}`);
+
+                // Clear any existing timeout
+                if (successSoundTimeoutRef.current) {
+                    clearTimeout(successSoundTimeoutRef.current);
+                }
+
+                // Set timeout to allow reactions again after 5 seconds
+                successSoundTimeoutRef.current = setTimeout(() => {
+                    successSoundPlayingRef.current = false;
+                    successSoundTimeoutRef.current = null;
+                    console.log("[KitchenAudio] Success sound timeout complete, reactions enabled");
+                }, 5000);
             }
         }
 
         // Update the ref for next render
         prevNewDiscoveryRef.current = newDiscovery;
-    }, [newDiscovery, localIsMuted, loadedSounds, playSound, loadingAttempted]);
+    }, [newDiscovery, isMuted]);
 
-    // Play UI sounds
+    // Effect for handling recipe book sound
     useEffect(() => {
         // Only play sound when showCraftPanel changes to a different value
-        if (
-            showCraftPanel !== undefined &&
+        if (showCraftPanel !== undefined &&
             showCraftPanel !== prevShowCraftPanelRef.current &&
-            !localIsMuted &&
-            loadingAttempted &&
-            loadedSounds.includes(AUDIO_FILES.UI_PAGE_TURN.id)
-        ) {
-            playSound(AUDIO_FILES.UI_PAGE_TURN.id, AUDIO_FILES.UI_PAGE_TURN.volume);
+            !isMuted &&
+            globalAudio.isSoundLoaded(AUDIO_IDS.UI_PAGE_TURN)) {
+
+            globalAudio.playSound(AUDIO_IDS.UI_PAGE_TURN, 0.7);
         }
 
         // Update the ref for next render
         prevShowCraftPanelRef.current = showCraftPanel;
-    }, [showCraftPanel, localIsMuted, loadedSounds, playSound, loadingAttempted]);
+    }, [showCraftPanel, isMuted]);
 
-    // Handle stirring sound effects
+    // Effect for handling stirring sound
     useEffect(() => {
         // Play sound when user starts stirring
-        if (isStirring && !localIsMuted && loadedSounds.includes(AUDIO_FILES.UI_CLICK.id)) {
+        if (isStirring && !isMuted && globalAudio.isSoundLoaded(AUDIO_IDS.UI_CLICK)) {
             // Play UI click sound as a stirring sound
-            playSound(AUDIO_FILES.UI_CLICK.id, 0.3);
+            globalAudio.playSound(AUDIO_IDS.UI_CLICK, 0.3);
         }
-    }, [isStirring, localIsMuted, loadedSounds, playSound]);
+    }, [isStirring, isMuted]);
 
-    // Adjust audio when TV is turned on
+    // Effect for handling TV state (adjust background volume)
     useEffect(() => {
-        if (!loadingAttempted || !isReady) return;
-
-        if (tvOn && loadedSounds.includes(AUDIO_FILES.PIANO_MUSIC.id) && activeLoopsRef.current.piano) {
-            // Fade out background music when TV is on
-            setLoopVolume(AUDIO_FILES.PIANO_MUSIC.id, 0.1);
-        } else if (loadedSounds.includes(AUDIO_FILES.PIANO_MUSIC.id) && activeLoopsRef.current.piano) {
-            // Restore normal volume
-            setLoopVolume(AUDIO_FILES.PIANO_MUSIC.id, AUDIO_FILES.PIANO_MUSIC.volume);
+        if (tvOn !== prevTvOnRef.current) {
+            if (tvOn && globalAudio.isLoopActive(AUDIO_IDS.PIANO)) {
+                // Fade out background music when TV is on
+                globalAudio.setLoopVolume(AUDIO_IDS.PIANO, 0.1);
+            } else if (!tvOn && globalAudio.isLoopActive(AUDIO_IDS.PIANO)) {
+                // Restore normal volume
+                globalAudio.setLoopVolume(AUDIO_IDS.PIANO, 0.4);
+            }
         }
-    }, [tvOn, loadedSounds, setLoopVolume, loadingAttempted, isReady]);
 
-    // For debugging purposes, we can log what sounds are loaded
+        // Update the ref for next render
+        prevTvOnRef.current = tvOn;
+    }, [tvOn]);
+
+    // Cleanup function when component unmounts
     useEffect(() => {
-        if (loadedSounds.length > 0) {
-            console.log("KitchenAudio: Currently loaded sounds:", loadedSounds);
-        }
-    }, [loadedSounds]);
+        return () => {
+            console.log("[KitchenAudio] Unmounting, cleaning up audio resources");
+
+            // Don't stop background sounds on unmount, as they should persist
+            // between scene changes. If you want to stop them, uncomment:
+            // globalAudio.stopLoop(AUDIO_IDS.PIANO);
+            // globalAudio.stopLoop(AUDIO_IDS.OCEAN);
+
+            // Clear timers
+            cleanupTimers();
+        };
+    }, []);
 
     // This component doesn't render anything visible
     return null;

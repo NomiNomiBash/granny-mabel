@@ -1,5 +1,5 @@
 // src/scenes/Kitchen.jsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,9 @@ import {
     RecipeInstructions,
     CombineArea
 } from '../components/kitchen/KitchenUI';
+
+// Import GlobalAudio system
+import globalAudio from '../utils/GlobalAudio';
 
 function Kitchen() {
     const navigate = useNavigate();
@@ -43,13 +46,28 @@ function Kitchen() {
     const [selectedIngredients, setSelectedIngredients] = useState([null, null]);
     const [potContent, setPotContent] = useState({ name: "", color: "#E3F2FD", emoji: "" });
 
+    // Initialize global audio system when component mounts
+    useEffect(() => {
+        console.log("Kitchen scene mounted, initializing global audio");
+
+        // This makes sure the global audio system is initialized
+        // It won't re-initialize if already done
+        globalAudio.init();
+
+        return () => {
+            // Cleanup code if needed
+            // Note: we don't stop background loops on unmount
+            // as they should continue between scenes
+        };
+    }, []);
+
     // User interaction to enable audio
-    const enableAudio = () => {
+    const enableAudio = useCallback(() => {
         if (!audioTriggeredRef.current) {
             setAudioEnabled(true);
             audioTriggeredRef.current = true;
         }
-    };
+    }, []);
 
     // Listen for any user interaction to enable audio (browser policy)
     useEffect(() => {
@@ -64,7 +82,7 @@ function Kitchen() {
             window.removeEventListener('click', handleUserInteraction);
             window.removeEventListener('keydown', handleUserInteraction);
         };
-    }, []);
+    }, [enableAudio]);
 
     // Listen for E key press and R key press
     useEffect(() => {
@@ -84,7 +102,7 @@ function Kitchen() {
     }, [tvOn]);
 
     // TV turn on sequence
-    const turnOnTV = () => {
+    const turnOnTV = useCallback(() => {
         setShowPrompt(false);
         setTvOn(true);
 
@@ -92,42 +110,42 @@ function Kitchen() {
         setTimeout(() => {
             navigate('/tv');
         }, 800);
-    };
+    }, [navigate]);
 
     // Handle ingredient selection
-    const selectIngredient = (ingredient) => {
+    const selectIngredient = useCallback((ingredient) => {
         if (!ingredient) {
             console.error("Tried to select undefined ingredient");
             return;
         }
 
-        // Create a new array with the updated ingredients
-        let newSelectedIngredients = [...selectedIngredients];
+        setSelectedIngredients(prevSelected => {
+            // Create a new array with the updated ingredients
+            let newSelectedIngredients = [...prevSelected];
 
-        if (selectedIngredients[0] === null) {
-            // First slot is empty, add to first slot
-            newSelectedIngredients[0] = ingredient;
-            setSelectedIngredients(newSelectedIngredients);
-        } else if (selectedIngredients[1] === null) {
-            // Second slot is empty, add to second slot and combine
-            newSelectedIngredients[1] = ingredient;
-            setSelectedIngredients(newSelectedIngredients);
+            if (prevSelected[0] === null) {
+                // First slot is empty, add to first slot
+                newSelectedIngredients[0] = ingredient;
+                return newSelectedIngredients;
+            } else if (prevSelected[1] === null) {
+                // Second slot is empty, add to second slot
+                newSelectedIngredients[1] = ingredient;
 
-            // We need to use setTimeout to ensure state is updated before combining
-            setTimeout(() => {
-                if (newSelectedIngredients[0] && newSelectedIngredients[1]) {
-                    combineIngredients(newSelectedIngredients[0], newSelectedIngredients[1]);
-                }
-            }, 100);
-        } else {
-            // Both slots are full, reset and add to first slot
-            newSelectedIngredients = [ingredient, null];
-            setSelectedIngredients(newSelectedIngredients);
-        }
-    };
+                // We need to use setTimeout to ensure state is updated before combining
+                setTimeout(() => {
+                    combineIngredients(newSelectedIngredients[0], ingredient);
+                }, 100);
+
+                return newSelectedIngredients;
+            } else {
+                // Both slots are full, reset and add to first slot
+                return [ingredient, null];
+            }
+        });
+    }, []);
 
     // Combine ingredients
-    const combineIngredients = (ingredient1, ingredient2) => {
+    const combineIngredients = useCallback((ingredient1, ingredient2) => {
         // Check both combinations (order doesn't matter)
         const combination = `${ingredient1.name}+${ingredient2.name}`;
         const reverseCombination = `${ingredient2.name}+${ingredient1.name}`;
@@ -136,28 +154,32 @@ function Kitchen() {
 
         if (result) {
             // Check if this is a new discovery
-            const alreadyDiscovered = ingredientsDiscovered.some(i => i.name === result.name);
+            setIngredientsDiscovered(prevDiscovered => {
+                const alreadyDiscovered = prevDiscovered.some(i => i.name === result.name);
 
-            // Create new ingredient object
-            const newIngredient = {
-                id: ingredientsDiscovered.length + 1,
-                name: result.name,
-                emoji: result.emoji,
-                color: result.color,
-                category: result.category || "crafted"
-            };
+                // Create new ingredient object
+                const newIngredient = {
+                    id: prevDiscovered.length + 1,
+                    name: result.name,
+                    emoji: result.emoji,
+                    color: result.color,
+                    category: result.category || "crafted"
+                };
 
-            if (!alreadyDiscovered) {
-                // Add to discovered ingredients
-                setIngredientsDiscovered(prev => [...prev, newIngredient]);
+                if (!alreadyDiscovered) {
+                    // Show discovery notification
+                    setNewDiscovery(result.name);
+                    setTimeout(() => setNewDiscovery(null), 3000);
 
-                // Show discovery notification
-                setNewDiscovery(result.name);
-                setTimeout(() => setNewDiscovery(null), 3000);
+                    // Automatically open the recipe book to show new discovery
+                    setShowCraftPanel(true);
 
-                // Automatically open the recipe book to show new discovery
-                setShowCraftPanel(true);
-            }
+                    // Add to discovered ingredients
+                    return [...prevDiscovered, newIngredient];
+                }
+
+                return prevDiscovered;
+            });
 
             // Update pot contents
             setPotContent({
@@ -175,12 +197,12 @@ function Kitchen() {
         setTimeout(() => {
             setSelectedIngredients([null, null]);
         }, 1000);
-    };
+    }, []);
 
     // Toggle recipe book
-    const toggleCraftPanel = () => {
+    const toggleCraftPanel = useCallback(() => {
         setShowCraftPanel(prev => !prev);
-    };
+    }, []);
 
     return (
         <KitchenContainer onClick={enableAudio}>
@@ -263,12 +285,12 @@ const SoundToggle = styled.button`
     justify-content: center;
     z-index: 1000;
     transition: all 0.2s ease;
-    
+
     &:hover {
         background-color: rgba(255, 255, 255, 1);
         transform: scale(1.1);
     }
-    
+
     &:active {
         transform: scale(0.95);
     }
