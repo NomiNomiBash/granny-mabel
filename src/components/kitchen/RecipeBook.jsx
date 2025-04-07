@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import globalAudio from '../../utils/GlobalAudio';
 
 const RecipeBookButton = styled.div`
     position: absolute;
@@ -116,6 +117,12 @@ const IngredientName = styled.div`
     color: #5D4037;
 `;
 
+// Helper function to play UI click sound
+const playUIClickSound = () => {
+    // Use the global audio system to play the UI click sound
+    globalAudio.playUIClick(0.6);
+};
+
 const RecipeBookComponent = ({ onClick }) => (
     <RecipeBookButton
         onClick={(e) => {
@@ -142,6 +149,10 @@ const RecipeBookPanel = ({ ingredients, onIngredientClick }) => (
                     onClick={() => {
                         // Only allow clicking if not scarce
                         if (!ingredient.scarce) {
+                            // Play UI click sound first
+                            playUIClickSound();
+
+                            // Then call the original click handler
                             onIngredientClick(ingredient);
                         }
                     }}
@@ -163,3 +174,5 @@ const RecipeBookPanel = ({ ingredients, onIngredientClick }) => (
 export const RecipeBook = Object.assign(RecipeBookComponent, {
     Panel: RecipeBookPanel
 });
+
+export default RecipeBook;

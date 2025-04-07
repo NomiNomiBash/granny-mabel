@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import audioManager from '../../utils/AudioManager';
+import globalAudio from '../../utils/GlobalAudio';
 
 // List of essential audio files that must be preloaded
 const ESSENTIAL_AUDIO = [
@@ -44,27 +44,27 @@ const AudioPreloader = ({ onComplete }) => {
     useEffect(() => {
         let isMounted = true; // Track if component is mounted
 
-        // Initialize audio context
-        audioManager.init();
+        // Initialize audio system
+        globalAudio.init();
 
         // Start a timer to ensure we don't block indefinitely on audio loading
         loadTimerRef.current = setTimeout(() => {
             if (isMounted) {
-                console.log("Audio loading timed out, continuing anyway");
+                console.log("[AudioPreloader] Audio loading timed out, continuing anyway");
                 setEssentialLoaded(true);
                 setLoadingProgress(100);
                 setMessage("Ready! Click or press any key to continue...");
             }
-        }, 10000); // 10 second timeout (increased from 5 for slower connections)
+        }, 10000); // 10 second timeout
 
         // Function to load essential audio files with proper tracking and error handling
         const loadEssentialAudio = async () => {
             const state = loadStateRef.current;
 
             // Create an array of promises for all essential audio loads
-            const loadPromises = ESSENTIAL_AUDIO.map(async (audio, index) => {
+            const loadPromises = ESSENTIAL_AUDIO.map(async (audio) => {
                 try {
-                    const success = await audioManager.loadSound(audio.id, audio.url);
+                    const success = await globalAudio.loadSound(audio.id, audio.url);
                     if (isMounted) {
                         state.essentialCount++;
                         // Update progress to be proportional to essential audio loading (70% of total)
@@ -72,13 +72,13 @@ const AudioPreloader = ({ onComplete }) => {
                         setLoadingProgress(essentialProgress);
 
                         if (success) {
-                            console.log(`Successfully loaded essential audio: ${audio.id}`);
+                            console.log(`[AudioPreloader] Successfully loaded essential audio: ${audio.id}`);
                         } else {
-                            console.warn(`Failed to load essential audio: ${audio.id}, but continuing`);
+                            console.warn(`[AudioPreloader] Failed to load essential audio: ${audio.id}, but continuing`);
                         }
                     }
                 } catch (error) {
-                    console.error(`Error loading essential audio ${audio.id}:`, error);
+                    console.error(`[AudioPreloader] Error loading essential audio ${audio.id}:`, error);
                 }
             });
 
@@ -110,7 +110,7 @@ const AudioPreloader = ({ onComplete }) => {
                 if (!isMounted) break; // Stop if component unmounted
 
                 try {
-                    await audioManager.loadSound(audio.id, audio.url);
+                    await globalAudio.loadSound(audio.id, audio.url);
                     if (isMounted) {
                         state.backgroundCount++;
                         // Background loading is the remaining 30% of progress
@@ -118,13 +118,19 @@ const AudioPreloader = ({ onComplete }) => {
                         setLoadingProgress(totalProgress);
                     }
                 } catch (error) {
-                    console.warn(`Background audio ${audio.id} failed to load, continuing anyway`, error);
+                    console.warn(`[AudioPreloader] Background audio ${audio.id} failed to load, continuing anyway`, error);
                 }
             }
         };
 
         // Start loading
         loadEssentialAudio();
+
+        console.log("Checking loaded sounds status:");
+        const allSounds = [...ESSENTIAL_AUDIO, ...BACKGROUND_AUDIO];
+        allSounds.forEach(audio => {
+            console.log(`Sound ${audio.id}: ${globalAudio.isSoundLoaded(audio.id) ? 'Loaded' : 'Not loaded'}`);
+        });
 
         // Cleanup function
         return () => {
@@ -136,25 +142,14 @@ const AudioPreloader = ({ onComplete }) => {
         };
     }, []);
 
-    // Handle user interaction to start the audio context
+    // Handle user interaction to ensure audio is unlocked
     useEffect(() => {
         if (essentialLoaded && userInteracted) {
-            // Make sure audio context is resumed before completing
-            if (audioManager.context && audioManager.context.state === 'suspended') {
-                audioManager.context.resume()
-                    .then(() => {
-                        // Complete loading and move to the main app
-                        onComplete();
-                    })
-                    .catch(error => {
-                        console.error("Failed to resume audio context:", error);
-                        // Still complete even if audio context fails
-                        onComplete();
-                    });
-            } else {
-                // Complete loading and move to the main app
-                onComplete();
-            }
+            // Try to ensure audio is unlocked before proceeding
+            globalAudio.unlockAudio();
+
+            // Complete loading and move to the main app
+            onComplete();
         }
     }, [essentialLoaded, userInteracted, onComplete]);
 
@@ -212,6 +207,7 @@ const AudioPreloader = ({ onComplete }) => {
     );
 };
 
+// Styled components remain unchanged
 const PreloaderContainer = styled(motion.div)`
     position: fixed;
     top: 0;

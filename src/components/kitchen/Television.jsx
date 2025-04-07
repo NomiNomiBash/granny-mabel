@@ -2,6 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import globalAudio from '../../utils/GlobalAudio';
 
 const Television = styled(motion.div)`
     position: absolute;
@@ -60,9 +61,18 @@ const TVTurnOnFlash = styled(motion.div)`
 `;
 
 export const TelevisionComponent = ({ tvOn, showPrompt, turnOnTV }) => {
+    // Helper function to play UI click sound and then call the original handler
+    const handleTVClick = (e) => {
+        // Play UI click sound first
+        globalAudio.playUIClick();
+
+        // Then call the original handler
+        turnOnTV();
+    };
+
     return (
         <Television
-            onClick={turnOnTV}
+            onClick={handleTVClick}
             animate={tvOn ? {
                 scale: 1.05,
             } : {}}
@@ -71,7 +81,16 @@ export const TelevisionComponent = ({ tvOn, showPrompt, turnOnTV }) => {
             <TVScreen isOn={tvOn}>
                 {showPrompt && (
                     <TVPrompt
-                        onClick={turnOnTV}
+                        onClick={(e) => {
+                            // Prevent event bubbling to avoid double click sound
+                            e.stopPropagation();
+
+                            // Play UI click sound first
+                            globalAudio.playUIClick();
+
+                            // Then call the original handler
+                            turnOnTV();
+                        }}
                         animate={{
                             opacity: [0.8, 1, 0.8],
                             scale: [1, 1.05, 1]
@@ -101,3 +120,5 @@ export const TelevisionComponent = ({ tvOn, showPrompt, turnOnTV }) => {
         </Television>
     );
 };
+
+export default TelevisionComponent;
