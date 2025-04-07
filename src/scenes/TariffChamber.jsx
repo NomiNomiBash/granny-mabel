@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import globalAudio from '../utils/GlobalAudio'; // Import global audio system
 
 const ChamberContainer = styled.div`
     background-color: #0B0C10;
@@ -517,6 +518,17 @@ function TariffChamber({ gameState, setGameState }) {
     // Track tariff changes to unlock BOOST ALL
     const [totalTariffIncreases, setTotalTariffIncreases] = useState(0);
 
+    // Initialize audio when component mounts
+    useEffect(() => {
+        console.log("[TariffChamber] Setting scene to techno");
+        // Keep techno music playing from the TV scene
+        globalAudio.setScene('tvnews');
+
+        return () => {
+            // Cleanup if needed
+        };
+    }, []);
+
     // Create grid lines
     const horizontalGridLines = [];
     const verticalGridLines = [];
@@ -545,6 +557,8 @@ function TariffChamber({ gameState, setGameState }) {
     useEffect(() => {
         const handleKeyPress = (e) => {
             if (e.key === 'Escape') {
+                // Play click sound before navigating
+                globalAudio.playUIClick(0.6);
                 navigate('/return');
             }
         };
@@ -610,6 +624,9 @@ function TariffChamber({ gameState, setGameState }) {
             setBoostAllUnlocked(true);
             setShowUnlockNotification(true);
 
+            // Play a success sound for unlocking feature
+            globalAudio.playSound('ui_click', 0.8);
+
             // Hide notification after 3 seconds
             setTimeout(() => {
                 setShowUnlockNotification(false);
@@ -617,8 +634,11 @@ function TariffChamber({ gameState, setGameState }) {
         }
     }, [totalTariffIncreases, boostAllUnlocked]);
 
-    // Handle tariff boost
+    // Handle tariff boost with sound
     const boostTariff = (country) => {
+        // Play UI click sound
+        globalAudio.playUIClick(0.5);
+
         const boostAmount = 1; // Boost by 1% per click
 
         const newTariffs = tariffs.map(tariff => {
@@ -641,9 +661,12 @@ function TariffChamber({ gameState, setGameState }) {
         setTimer(100); // Reset the timer on boost
     };
 
-    // Boost all tariffs at once by a smaller amount
+    // Boost all tariffs at once by a smaller amount with sound
     const boostAllTariffs = () => {
         if (!boostAllUnlocked) return; // Prevent action if not unlocked
+
+        // Play UI click sound (slightly louder for the boost all)
+        globalAudio.playUIClick(0.7);
 
         const boostAmount = 2; // Smaller boost for all at once
 
@@ -657,8 +680,11 @@ function TariffChamber({ gameState, setGameState }) {
         setTimer(100); // Reset the timer on boost
     };
 
-    // Reset tariffs to original values
+    // Reset tariffs to original values with sound
     const resetTariffs = () => {
+        // Play UI click sound
+        globalAudio.playUIClick(0.6);
+
         const newTariffs = tariffs.map(tariff => {
             return { ...tariff, tariffRate: tariff.baseTariff };
         });
@@ -737,6 +763,19 @@ function TariffChamber({ gameState, setGameState }) {
         return path;
     };
 
+    // Handler for when country marker is clicked
+    const handleCountryMarkerClick = (country) => {
+        // Play click sound with varying pitch based on tariff rate
+        const tariff = tariffs.find(t => t.country === country);
+        if (tariff) {
+            // Higher tariff countries make slightly higher pitched sounds (variation in volume)
+            const volumeLevel = 0.4 + (Math.min(90, tariff.tariffRate) / 200);
+            globalAudio.playUIClick(volumeLevel);
+        }
+
+        boostTariff(country);
+    };
+
     return (
         <ChamberContainer>
             {/* Background grid */}
@@ -805,7 +844,7 @@ function TariffChamber({ gameState, setGameState }) {
                                     tariffRate={country.tariffRate}
                                     baseTariff={country.baseTariff}
                                     size={country.size}
-                                    onClick={() => boostTariff(country.country)}
+                                    onClick={() => handleCountryMarkerClick(country.country)}
                                 />
                             ))}
                         </MapContainer>

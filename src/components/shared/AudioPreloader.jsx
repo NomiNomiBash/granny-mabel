@@ -8,6 +8,8 @@ import globalAudio from '../../utils/GlobalAudio';
 const ESSENTIAL_AUDIO = [
     { id: 'piano', url: '/src/assets/pianomusic.wav' },
     { id: 'ocean', url: '/src/assets/ES_Small Waves, Ocean, Beach, Crickets - Epidemic Sound.wav' },
+    { id: 'techno', url: '/src/assets/techbrotechno.wav' }, // Add techno music as essential
+    { id: 'ui_click', url: '/src/assets/ui_click.wav' }, // Move UI click to essential for better responsiveness
     { id: 'grandma_success_1', url: '/src/assets/before/grandma_craft_success_1.mp3' }
 ];
 
@@ -22,8 +24,12 @@ const BACKGROUND_AUDIO = [
     { id: 'grandma_success_3', url: '/src/assets/before/grandma_craft_success_3.mp3' },
     { id: 'grandma_success_4', url: '/src/assets/before/grandma_craft_success_4.mp3' },
     { id: 'grandma_success_5', url: '/src/assets/before/grandma_craft_success_5.mp3' },
-    { id: 'ui_click', url: '/src/assets/ui_click.wav' },
-    { id: 'ui_page_turn', url: '/src/assets/ui_page_turn.wav' }
+    { id: 'ui_page_turn', url: '/src/assets/ui_page_turn.wav' },
+    { id: 'grandma_fail_1', url: '/src/assets/after/grandma_craft_fail_1.mp3' },
+    { id: 'grandma_fail_2', url: '/src/assets/after/grandma_craft_fail_2.mp3' },
+    { id: 'grandma_fail_3', url: '/src/assets/after/grandma_craft_fail_3.mp3' },
+    { id: 'grandma_fail_4', url: '/src/assets/after/grandma_craft_fail_4.mp3' },
+    { id: 'grandma_fail_5', url: '/src/assets/after/grandma_craft_fail_5.mp3' },
 ];
 
 const AudioPreloader = ({ onComplete }) => {
@@ -126,7 +132,7 @@ const AudioPreloader = ({ onComplete }) => {
         // Start loading
         loadEssentialAudio();
 
-        console.log("Checking loaded sounds status:");
+        console.log("[AudioPreloader] Checking loaded sounds status:");
         const allSounds = [...ESSENTIAL_AUDIO, ...BACKGROUND_AUDIO];
         allSounds.forEach(audio => {
             console.log(`Sound ${audio.id}: ${globalAudio.isSoundLoaded(audio.id) ? 'Loaded' : 'Not loaded'}`);
@@ -147,6 +153,11 @@ const AudioPreloader = ({ onComplete }) => {
         if (essentialLoaded && userInteracted) {
             // Try to ensure audio is unlocked before proceeding
             globalAudio.unlockAudio();
+
+            // Play a click sound when user starts the game
+            if (globalAudio.isSoundLoaded('ui_click')) {
+                globalAudio.playSound('ui_click', 0.7);
+            }
 
             // Complete loading and move to the main app
             onComplete();

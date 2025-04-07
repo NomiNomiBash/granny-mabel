@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,7 @@ import { KitchenBackground } from '../components/kitchen/KitchenBackground';
 import { CookingArea } from '../components/kitchen/CookingArea';
 import { RecipeBook } from '../components/kitchen/RecipeBook';
 import { TelevisionComponent } from '../components/kitchen/Television';
+import ChangedKitchenAudio from '../components/kitchen/ChangedKitchenAudio';
 import {
     DiscoveryCounter,
     DiscoveryNotification,
@@ -17,6 +18,9 @@ import {
     StickyNote
 } from '../components/kitchen/KitchenUI';
 import {InfiniteRecipes} from "../data/RecipeData.js";
+
+// Import GlobalAudio system
+import globalAudio from '../utils/GlobalAudio';
 
 // Add ingredient origin information
 const IngredientOrigins = {
@@ -39,6 +43,8 @@ function ChangedKitchen({ gameState }) {
     const [isStirring, setIsStirring] = useState(false);
     const [newDiscovery, setNewDiscovery] = useState(null);
     const [showCraftPanel, setShowCraftPanel] = useState(false);
+    const [audioEnabled, setAudioEnabled] = useState(true);
+    const audioTriggeredRef = useRef(false);
 
     // Initial ingredients with a focus on noodle-making
     const [ingredientsDiscovered, setIngredientsDiscovered] = useState([
@@ -56,6 +62,44 @@ function ChangedKitchen({ gameState }) {
 
     const [selectedIngredients, setSelectedIngredients] = useState([null, null]);
     const [potContent, setPotContent] = useState({ name: "", color: "#E3F2FD", emoji: "" });
+
+    // Initialize global audio system when component mounts
+    useEffect(() => {
+        console.log("ChangedKitchen scene mounted, initializing global audio");
+
+        // This makes sure the global audio system is initialized
+        // It won't re-initialize if already done
+        globalAudio.init();
+
+        return () => {
+            // Cleanup code if needed
+            // Note: we don't stop background loops on unmount
+            // as they should continue between scenes
+        };
+    }, []);
+
+    // User interaction to enable audio
+    const enableAudio = useCallback(() => {
+        if (!audioTriggeredRef.current) {
+            setAudioEnabled(true);
+            audioTriggeredRef.current = true;
+        }
+    }, []);
+
+    // Listen for any user interaction to enable audio (browser policy)
+    useEffect(() => {
+        const handleUserInteraction = () => {
+            enableAudio();
+        };
+
+        window.addEventListener('click', handleUserInteraction);
+        window.addEventListener('keydown', handleUserInteraction);
+
+        return () => {
+            window.removeEventListener('click', handleUserInteraction);
+            window.removeEventListener('keydown', handleUserInteraction);
+        };
+    }, [enableAudio]);
 
     // Determine resource scarcity based on tariff rates
     const getIngredientScarcity = (ingredientName) => {
@@ -79,6 +123,9 @@ function ChangedKitchen({ gameState }) {
                 turnOnTV();
             } else if (e.key.toLowerCase() === 'r') {
                 setShowCraftPanel(prev => !prev);
+            } else if (e.key.toLowerCase() === 'm') {
+                // Toggle audio on/off with M key
+                setAudioEnabled(prev => !prev);
             }
         };
 
@@ -87,7 +134,7 @@ function ChangedKitchen({ gameState }) {
     }, [tvOn]);
 
     // TV turn on sequence
-    const turnOnTV = () => {
+    const turnOnTV = useCallback(() => {
         setShowPrompt(false);
         setTvOn(true);
 
@@ -95,10 +142,10 @@ function ChangedKitchen({ gameState }) {
         setTimeout(() => {
             navigate('/tv');
         }, 800);
-    };
+    }, [navigate]);
 
     // Handle ingredient selection
-    const selectIngredient = (ingredient) => {
+    const selectIngredient = useCallback((ingredient) => {
         if (!ingredient) {
             console.error("Tried to select undefined ingredient");
             return;
@@ -110,33 +157,33 @@ function ChangedKitchen({ gameState }) {
             console.log(`${ingredient.name} is scarce due to high tariffs`);
         }
 
-        // Create a new array with the updated ingredients
-        let newSelectedIngredients = [...selectedIngredients];
+        setSelectedIngredients(prevSelected => {
+            // Create a new array with the updated ingredients
+            let newSelectedIngredients = [...prevSelected];
 
-        if (selectedIngredients[0] === null) {
-            // First slot is empty, add to first slot
-            newSelectedIngredients[0] = ingredient;
-            setSelectedIngredients(newSelectedIngredients);
-        } else if (selectedIngredients[1] === null) {
-            // Second slot is empty, add to second slot and combine
-            newSelectedIngredients[1] = ingredient;
-            setSelectedIngredients(newSelectedIngredients);
+            if (prevSelected[0] === null) {
+                // First slot is empty, add to first slot
+                newSelectedIngredients[0] = ingredient;
+                return newSelectedIngredients;
+            } else if (prevSelected[1] === null) {
+                // Second slot is empty, add to second slot
+                newSelectedIngredients[1] = ingredient;
 
-            // We need to use setTimeout to ensure state is updated before combining
-            setTimeout(() => {
-                if (newSelectedIngredients[0] && newSelectedIngredients[1]) {
-                    combineIngredients(newSelectedIngredients[0], newSelectedIngredients[1]);
-                }
-            }, 100);
-        } else {
-            // Both slots are full, reset and add to first slot
-            newSelectedIngredients = [ingredient, null];
-            setSelectedIngredients(newSelectedIngredients);
-        }
-    };
+                // We need to use setTimeout to ensure state is updated before combining
+                setTimeout(() => {
+                    combineIngredients(newSelectedIngredients[0], ingredient);
+                }, 100);
+
+                return newSelectedIngredients;
+            } else {
+                // Both slots are full, reset and add to first slot
+                return [ingredient, null];
+            }
+        });
+    }, []);
 
     // Combine ingredients
-    const combineIngredients = (ingredient1, ingredient2) => {
+    const combineIngredients = useCallback((ingredient1, ingredient2) => {
         // Check both combinations (order doesn't matter)
         const combination = `${ingredient1.name}+${ingredient2.name}`;
         const reverseCombination = `${ingredient2.name}+${ingredient1.name}`;
@@ -145,27 +192,32 @@ function ChangedKitchen({ gameState }) {
 
         if (result) {
             // Check if this is a new discovery
-            const alreadyDiscovered = ingredientsDiscovered.some(i => i.name === result.name);
+            setIngredientsDiscovered(prevDiscovered => {
+                const alreadyDiscovered = prevDiscovered.some(i => i.name === result.name);
 
-            // Create new ingredient object
-            const newIngredient = {
-                id: ingredientsDiscovered.length + 1,
-                name: result.name,
-                emoji: result.emoji,
-                color: result.color
-            };
+                // Create new ingredient object
+                const newIngredient = {
+                    id: prevDiscovered.length + 1,
+                    name: result.name,
+                    emoji: result.emoji,
+                    color: result.color,
+                    category: result.category || "crafted"
+                };
 
-            if (!alreadyDiscovered) {
-                // Add to discovered ingredients
-                setIngredientsDiscovered(prev => [...prev, newIngredient]);
+                if (!alreadyDiscovered) {
+                    // Show discovery notification
+                    setNewDiscovery(result.name);
+                    setTimeout(() => setNewDiscovery(null), 3000);
 
-                // Show discovery notification
-                setNewDiscovery(result.name);
-                setTimeout(() => setNewDiscovery(null), 3000);
+                    // Automatically open the recipe book to show new discovery
+                    setShowCraftPanel(true);
 
-                // Automatically open the recipe book to show new discovery
-                setShowCraftPanel(true);
-            }
+                    // Add to discovered ingredients
+                    return [...prevDiscovered, newIngredient];
+                }
+
+                return prevDiscovered;
+            });
 
             // Update pot contents
             setPotContent({
@@ -183,17 +235,26 @@ function ChangedKitchen({ gameState }) {
         setTimeout(() => {
             setSelectedIngredients([null, null]);
         }, 1000);
-    };
+    }, []);
 
     // Toggle recipe book
-    const toggleCraftPanel = () => {
+    const toggleCraftPanel = useCallback(() => {
         setShowCraftPanel(prev => !prev);
-    };
+    }, []);
 
     return (
-        <KitchenContainer>
-            <KitchenBackground />
+        <KitchenContainer onClick={enableAudio}>
+            {/* Audio component - this will play the fail sounds instead of success sounds */}
+            <ChangedKitchenAudio
+                isStirring={isStirring}
+                potContent={potContent}
+                newDiscovery={newDiscovery}
+                showCraftPanel={showCraftPanel}
+                tvOn={tvOn}
+                isMuted={!audioEnabled}
+            />
 
+            <KitchenBackground />
             <CookingArea
                 potContent={potContent}
                 isStirring={isStirring}
@@ -217,6 +278,13 @@ function ChangedKitchen({ gameState }) {
                     onIngredientClick={selectIngredient}
                 />
             )}
+
+            {/* Sound toggle button */}
+            <SoundToggle
+                onClick={() => setAudioEnabled(prev => !prev)}
+            >
+                {audioEnabled ? '🔊' : '🔇'}
+            </SoundToggle>
 
             <DiscoveryCounter
                 discoveries={ingredientsDiscovered.length}
@@ -256,6 +324,34 @@ function ChangedKitchen({ gameState }) {
         </KitchenContainer>
     );
 }
+
+// Sound toggle button component
+const SoundToggle = styled.button`
+    position: absolute;
+    top: 150px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+`;
 
 // Keep the main container here for cleaner imports
 const KitchenContainer = styled.div`

@@ -1,16 +1,16 @@
-// src/components/kitchen/KitchenAudio.jsx
 import { useEffect, useRef } from 'react';
 import globalAudio from '../../utils/GlobalAudio';
 
-// KitchenAudio component - redesigned to work with global audio system
-const KitchenAudio = ({
-                          isStirring = false,
-                          potContent = null,
-                          newDiscovery = false,
-                          showCraftPanel = null,
-                          tvOn = false,
-                          isMuted = false
-                      }) => {
+// ChangedKitchenAudio component - redesigned to work with global audio system
+// Updated version for ChangedKitchen that plays failure sounds instead of success sounds
+const ChangedKitchenAudio = ({
+                                 isStirring = false,
+                                 potContent = null,
+                                 newDiscovery = false,
+                                 showCraftPanel = null,
+                                 tvOn = false,
+                                 isMuted = false
+                             }) => {
     // Keep track of previous state to detect changes
     const prevShowCraftPanelRef = useRef(showCraftPanel);
     const prevNewDiscoveryRef = useRef(newDiscovery);
@@ -25,9 +25,9 @@ const KitchenAudio = ({
     const setupDoneRef = useRef(false);
     const backgroundStartedRef = useRef(false);
 
-    // Track if a success sound is currently playing
-    const successSoundPlayingRef = useRef(false);
-    const successSoundTimeoutRef = useRef(null);
+    // Track if a fail sound is currently playing
+    const failSoundPlayingRef = useRef(false);
+    const failSoundTimeoutRef = useRef(null);
 
     // Track if reaction has played initially
     const initialReactionPlayedRef = useRef(false);
@@ -40,7 +40,7 @@ const KitchenAudio = ({
         CURLEW: 'curlew',
         UI_CLICK: 'ui_click',
         UI_PAGE_TURN: 'ui_page_turn',
-        TECHNO: 'techno', // Add techno music ID
+        TECHNO: 'techno',
 
         // Grandma sounds
         GRANDMA_HMM: 'grandma_hmm',
@@ -48,17 +48,17 @@ const KitchenAudio = ({
         GRANDMA_MMM: 'grandma_mmm',
         GRANDMA_MMHMM: 'grandma_mmhmm',
 
-        // Craft success sounds
-        GRANDMA_SUCCESS_1: 'grandma_success_1',
-        GRANDMA_SUCCESS_2: 'grandma_success_2',
-        GRANDMA_SUCCESS_3: 'grandma_success_3',
-        GRANDMA_SUCCESS_4: 'grandma_success_4',
-        GRANDMA_SUCCESS_5: 'grandma_success_5',
+        // Craft fail sounds (for ChangedKitchen)
+        GRANDMA_FAIL_1: 'grandma_fail_1',
+        GRANDMA_FAIL_2: 'grandma_fail_2',
+        GRANDMA_FAIL_3: 'grandma_fail_3',
+        GRANDMA_FAIL_4: 'grandma_fail_4',
+        GRANDMA_FAIL_5: 'grandma_fail_5',
     };
 
     // Helper to play a grandma reaction sound
     const playGrandmaReaction = () => {
-        if (isMuted || successSoundPlayingRef.current) return false;
+        if (isMuted || failSoundPlayingRef.current) return false;
 
         const reactionSounds = [
             AUDIO_IDS.GRANDMA_HMM,
@@ -74,7 +74,7 @@ const KitchenAudio = ({
         if (loadedReactions.length > 0) {
             const randomIndex = Math.floor(Math.random() * loadedReactions.length);
             const soundId = loadedReactions[randomIndex];
-            console.log(`[KitchenAudio] Playing grandma reaction sound: ${soundId}`);
+            console.log(`[ChangedKitchenAudio] Playing grandma reaction sound: ${soundId}`);
             // Increase volume to make sure we hear it
             globalAudio.playSound(soundId, 1.0);
             return true;
@@ -87,7 +87,7 @@ const KitchenAudio = ({
     useEffect(() => {
         if (setupDoneRef.current) return;
 
-        console.log("[KitchenAudio] Initial setup");
+        console.log("[ChangedKitchenAudio] Initial setup for ChangedKitchen");
         setupDoneRef.current = true;
 
         // Set the scene to kitchen in the global audio system
@@ -95,7 +95,7 @@ const KitchenAudio = ({
 
         // Listen for sounds being loaded
         const handleSoundLoaded = (event) => {
-            console.log(`[KitchenAudio] Sound loaded: ${event.id}`);
+            console.log(`[ChangedKitchenAudio] Sound loaded: ${event.id}`);
 
             // Start background loops once sounds are loaded
             startBackgroundIfReady();
@@ -113,7 +113,7 @@ const KitchenAudio = ({
 
                 initialReactionTimeoutRef.current = setTimeout(() => {
                     if (!initialReactionPlayedRef.current && !isMuted) {
-                        console.log("[KitchenAudio] Playing initial grandma reaction");
+                        console.log("[ChangedKitchenAudio] Playing initial grandma reaction");
                         if (playGrandmaReaction()) {
                             initialReactionPlayedRef.current = true;
                         }
@@ -139,12 +139,12 @@ const KitchenAudio = ({
         const oceanLoaded = globalAudio.isSoundLoaded(AUDIO_IDS.OCEAN);
 
         if (pianoLoaded && !globalAudio.isLoopActive(AUDIO_IDS.PIANO)) {
-            console.log("[KitchenAudio] Starting piano background");
+            console.log("[ChangedKitchenAudio] Starting piano background");
             globalAudio.startLoop(AUDIO_IDS.PIANO, 0.4);
         }
 
         if (oceanLoaded && !globalAudio.isLoopActive(AUDIO_IDS.OCEAN)) {
-            console.log("[KitchenAudio] Starting ocean background");
+            console.log("[ChangedKitchenAudio] Starting ocean background");
             globalAudio.startLoop(AUDIO_IDS.OCEAN, 0.2);
         }
 
@@ -171,9 +171,9 @@ const KitchenAudio = ({
             grandmaReactionTimerRef.current = null;
         }
 
-        if (successSoundTimeoutRef.current) {
-            clearTimeout(successSoundTimeoutRef.current);
-            successSoundTimeoutRef.current = null;
+        if (failSoundTimeoutRef.current) {
+            clearTimeout(failSoundTimeoutRef.current);
+            failSoundTimeoutRef.current = null;
         }
 
         if (initialReactionTimeoutRef.current) {
@@ -207,7 +207,7 @@ const KitchenAudio = ({
         }
 
         // Play the first reaction sound immediately
-        if (!initialReactionPlayedRef.current && !isMuted && !successSoundPlayingRef.current) {
+        if (!initialReactionPlayedRef.current && !isMuted && !failSoundPlayingRef.current) {
             setTimeout(() => {
                 if (playGrandmaReaction()) {
                     initialReactionPlayedRef.current = true;
@@ -216,14 +216,14 @@ const KitchenAudio = ({
         }
 
         const timer = setInterval(() => {
-            // Skip if muted or if a success sound is currently playing
-            if (isMuted || successSoundPlayingRef.current) return;
+            // Skip if muted or if a fail sound is currently playing
+            if (isMuted || failSoundPlayingRef.current) return;
 
             // 50% chance to play a reaction sound
             if (Math.random() < 0.5) {
                 playGrandmaReaction();
             } else {
-                console.log("[KitchenAudio] Random chance didn't trigger sound this time");
+                console.log("[ChangedKitchenAudio] Random chance didn't trigger sound this time");
             }
         }, 5000); // Check every 5 seconds
 
@@ -234,7 +234,7 @@ const KitchenAudio = ({
     useEffect(() => {
         // Only act on state change, not initial render
         if (prevIsMutedRef.current !== isMuted && prevIsMutedRef.current !== undefined) {
-            console.log(`[KitchenAudio] Mute state changed: ${isMuted}`);
+            console.log(`[ChangedKitchenAudio] Mute state changed: ${isMuted}`);
 
             // If unmuting, try to start background
             if (!isMuted) {
@@ -253,44 +253,56 @@ const KitchenAudio = ({
         prevIsMutedRef.current = isMuted;
     }, [isMuted]);
 
-    // Effect for handling new discovery (plays success sound)
+    // Effect for handling new discovery (plays fail sound instead of success)
     useEffect(() => {
         // Only play sound when discovery state changes from false to true
         if (newDiscovery && !prevNewDiscoveryRef.current && !isMuted) {
+            // Use fail sounds instead of success sounds for ChangedKitchen
             const craftSounds = [
-                AUDIO_IDS.GRANDMA_SUCCESS_1,
-                AUDIO_IDS.GRANDMA_SUCCESS_2,
-                AUDIO_IDS.GRANDMA_SUCCESS_3,
-                AUDIO_IDS.GRANDMA_SUCCESS_4,
-                AUDIO_IDS.GRANDMA_SUCCESS_5
+                AUDIO_IDS.GRANDMA_FAIL_1,
+                AUDIO_IDS.GRANDMA_FAIL_2,
+                AUDIO_IDS.GRANDMA_FAIL_3,
+                AUDIO_IDS.GRANDMA_FAIL_4,
+                AUDIO_IDS.GRANDMA_FAIL_5
             ];
 
+            // Check which fail sounds are loaded
             const loadedCraftSounds = craftSounds.filter(id =>
                 globalAudio.isSoundLoaded(id)
             );
+
+            console.log(`[ChangedKitchenAudio] Loaded fail sounds: ${loadedCraftSounds.length}`);
 
             if (loadedCraftSounds.length > 0) {
                 const randomIndex = Math.floor(Math.random() * loadedCraftSounds.length);
                 const soundId = loadedCraftSounds[randomIndex];
 
-                // Mark that a success sound is playing to prevent reaction sounds
-                successSoundPlayingRef.current = true;
+                // Mark that a fail sound is playing to prevent reaction sounds
+                failSoundPlayingRef.current = true;
 
-                // Play the success sound
+                // Play the fail sound
                 globalAudio.playSound(soundId, 1.0);
-                console.log(`[KitchenAudio] Playing success sound: ${soundId}`);
+                console.log(`[ChangedKitchenAudio] Playing fail sound: ${soundId}`);
 
                 // Clear any existing timeout
-                if (successSoundTimeoutRef.current) {
-                    clearTimeout(successSoundTimeoutRef.current);
+                if (failSoundTimeoutRef.current) {
+                    clearTimeout(failSoundTimeoutRef.current);
                 }
 
                 // Set timeout to allow reactions again after 5 seconds
-                successSoundTimeoutRef.current = setTimeout(() => {
-                    successSoundPlayingRef.current = false;
-                    successSoundTimeoutRef.current = null;
-                    console.log("[KitchenAudio] Success sound timeout complete, reactions enabled");
+                failSoundTimeoutRef.current = setTimeout(() => {
+                    failSoundPlayingRef.current = false;
+                    failSoundTimeoutRef.current = null;
+                    console.log("[ChangedKitchenAudio] Fail sound timeout complete, reactions enabled");
                 }, 5000);
+            } else {
+                // If no fail sounds are loaded yet, log the issue
+                console.log("[ChangedKitchenAudio] No fail sounds loaded, checking sound status:");
+                console.log(`grandma_fail_1 loaded: ${globalAudio.isSoundLoaded('grandma_fail_1')}`);
+                console.log(`grandma_fail_2 loaded: ${globalAudio.isSoundLoaded('grandma_fail_2')}`);
+                console.log(`grandma_fail_3 loaded: ${globalAudio.isSoundLoaded('grandma_fail_3')}`);
+                console.log(`grandma_fail_4 loaded: ${globalAudio.isSoundLoaded('grandma_fail_4')}`);
+                console.log(`grandma_fail_5 loaded: ${globalAudio.isSoundLoaded('grandma_fail_5')}`);
             }
         }
 
@@ -350,7 +362,7 @@ const KitchenAudio = ({
     // Cleanup function when component unmounts
     useEffect(() => {
         return () => {
-            console.log("[KitchenAudio] Unmounting, cleaning up audio resources");
+            console.log("[ChangedKitchenAudio] Unmounting, cleaning up audio resources");
 
             // Don't stop background sounds on unmount, as they should persist
             // between scene changes. If you want to stop them, uncomment:
@@ -366,4 +378,4 @@ const KitchenAudio = ({
     return null;
 };
 
-export default KitchenAudio;
+export default ChangedKitchenAudio;
