@@ -29,6 +29,24 @@ function Kitchen() {
     const [audioEnabled, setAudioEnabled] = useState(true);
     const audioTriggeredRef = useRef(false);
 
+    // Default animation duration if no audio is present
+    const DEFAULT_ANIMATION_DURATION = 2000; // 2 seconds
+
+    // Audio duration - will be updated based on actual audio duration
+    const [audioDuration, setAudioDuration] = useState(DEFAULT_ANIMATION_DURATION);
+
+    // Callback to update audio duration when it changes
+    const handleAudioDurationChange = (newDurations) => {
+        // Use the discovery duration as our primary duration
+        // (since we don't have stirring sound)
+        const newDuration = newDurations.discovery || DEFAULT_ANIMATION_DURATION;
+
+        if (newDuration > 0 && newDuration !== audioDuration) {
+            console.log(`[Kitchen] Audio duration updated to: ${newDuration}ms`);
+            setAudioDuration(newDuration);
+        }
+    };
+
     // Ingredients state for infinite craft
     const [ingredientsDiscovered, setIngredientsDiscovered] = useState([
         { id: 1, name: "Water", emoji: "💧", color: "#E3F2FD", category: "base" },
@@ -46,6 +64,9 @@ function Kitchen() {
     const [selectedIngredients, setSelectedIngredients] = useState([null, null]);
     const [potContent, setPotContent] = useState({ name: "", color: "#E3F2FD", emoji: "" });
 
+    // Track when stirring animation should end
+    const stirringTimeoutRef = useRef(null);
+
     // Initialize global audio system when component mounts
     useEffect(() => {
         console.log("Kitchen scene mounted, initializing global audio");
@@ -56,8 +77,9 @@ function Kitchen() {
 
         return () => {
             // Cleanup code if needed
-            // Note: we don't stop background loops on unmount
-            // as they should continue between scenes
+            if (stirringTimeoutRef.current) {
+                clearTimeout(stirringTimeoutRef.current);
+            }
         };
     }, []);
 
@@ -100,6 +122,34 @@ function Kitchen() {
         window.addEventListener('keydown', handleKeyPress);
         return () => window.removeEventListener('keydown', handleKeyPress);
     }, [tvOn]);
+
+    // Listen for audio duration changes - handle stirring animation timing
+    useEffect(() => {
+        // If stirring is currently active, update the timeout to match the new duration
+        if (isStirring) {
+            console.log(`[Kitchen] Audio duration for stirring updated to: ${audioDuration}ms`);
+
+            // Clear existing timeout if it exists
+            if (stirringTimeoutRef.current) {
+                clearTimeout(stirringTimeoutRef.current);
+            }
+
+            // Set a new timeout to stop stirring after the audio duration
+            stirringTimeoutRef.current = setTimeout(() => {
+                console.log('[Kitchen] Stirring animation timeout complete, stopping stirring');
+                setIsStirring(false);
+                stirringTimeoutRef.current = null;
+            }, audioDuration);
+        }
+
+        // Cleanup function - clear timeout if component unmounts or isStirring changes
+        return () => {
+            if (stirringTimeoutRef.current) {
+                clearTimeout(stirringTimeoutRef.current);
+                stirringTimeoutRef.current = null;
+            }
+        };
+    }, [audioDuration, isStirring]);
 
     // TV turn on sequence
     const turnOnTV = useCallback(() => {
@@ -153,7 +203,17 @@ function Kitchen() {
         let result = InfiniteRecipes[combination] || InfiniteRecipes[reverseCombination];
 
         if (result) {
-            // Check if this is a new discovery
+            // Update pot contents
+            setPotContent({
+                name: result.name,
+                color: result.color,
+                emoji: result.emoji
+            });
+
+            // Start stirring animation immediately
+            setIsStirring(true);
+
+            // Check if this is a new discovery - handles discovery notification
             setIngredientsDiscovered(prevDiscovered => {
                 const alreadyDiscovered = prevDiscovered.some(i => i.name === result.name);
 
@@ -169,7 +229,13 @@ function Kitchen() {
                 if (!alreadyDiscovered) {
                     // Show discovery notification
                     setNewDiscovery(result.name);
-                    setTimeout(() => setNewDiscovery(null), 3000);
+
+                    // Use the current audio duration plus a buffer for notification
+                    // This needs to be long enough to cover the discovery sound
+                    const notificationDuration = Math.max(audioDuration, 5000) + 500;
+                    console.log(`[Kitchen] Setting discovery notification timeout: ${notificationDuration}ms`);
+
+                    setTimeout(() => setNewDiscovery(null), notificationDuration);
 
                     // Automatically open the recipe book to show new discovery
                     setShowCraftPanel(true);
@@ -181,23 +247,16 @@ function Kitchen() {
                 return prevDiscovered;
             });
 
-            // Update pot contents
-            setPotContent({
-                name: result.name,
-                color: result.color,
-                emoji: result.emoji
-            });
-
-            // Animate cooking
-            setIsStirring(true);
-            setTimeout(() => setIsStirring(false), 2000);
+            // NOTE: We do NOT set a timeout to end stirring here!
+            // Instead, we let the KitchenAudio component tell us when to stop stirring
+            // by updating the audioDuration, which will be picked up in the useEffect below
         }
 
         // Clear selection slots after a short delay
         setTimeout(() => {
             setSelectedIngredients([null, null]);
         }, 1000);
-    }, []);
+    }, [audioDuration]);
 
     // Toggle recipe book
     const toggleCraftPanel = useCallback(() => {
@@ -206,7 +265,7 @@ function Kitchen() {
 
     return (
         <KitchenContainer onClick={enableAudio}>
-            {/* Audio component */}
+            {/* Audio component - now using discovery sound duration */}
             <KitchenAudio
                 isStirring={isStirring}
                 potContent={potContent}
@@ -214,12 +273,14 @@ function Kitchen() {
                 showCraftPanel={showCraftPanel}
                 tvOn={tvOn}
                 isMuted={!audioEnabled}
+                onAudioDurationChange={handleAudioDurationChange}
             />
 
             <KitchenBackground />
             <CookingArea
                 potContent={potContent}
                 isStirring={isStirring}
+                audioLength={audioDuration} // Pass the audio duration to cooking area
             />
 
             <RecipeBook onClick={toggleCraftPanel} />
