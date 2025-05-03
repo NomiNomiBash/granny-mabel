@@ -5,18 +5,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import globalAudio from '../utils/GlobalAudio'; // Import global audio system
 
-const ChamberContainer = styled.div`
-    background-color: #0B0C10;
-    min-height: 100vh;
-    width: 100vw;
-    position: relative;
-    color: #C5C6C7;
-    overflow-x: hidden;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 20px 80px 20px;
+
 `;
 
 // Background grid effect
@@ -778,7 +767,11 @@ function TariffChamber({ gameState, setGameState }) {
     };
 
     return (
-        <ChamberContainer>
+        <ChamberContainer
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+        >
             {/* Background grid */}
             <Grid>
                 {horizontalGridLines}

@@ -28,6 +28,9 @@ const Television = styled(motion.div)`
     position: absolute;
     background-color: #444444;
     border-radius: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 `;
 
 const TVScreen = styled(motion.div)`
@@ -253,26 +256,11 @@ function TVNews() {
     const [isOn, setIsOn] = useState(true);
     const [showContent, setShowContent] = useState(false);
     const [scanLinePosition, setScanLinePosition] = useState(0);
+    const [isCentering, setIsCentering] = useState(false);
 
-    // Set up audio when component mounts
+
     useEffect(() => {
-        // Tell the audio system we're in the TV News scene
-        globalAudio.setScene('tvnews');
-
-        return () => {
-            // Clean up function when leaving the scene
-            // We don't need to stop techno music as the Kitchen component will handle that
-        };
-    }, []);
-
-    // Add click sound to interactions
-    const playClickSound = () => {
-        globalAudio.playUIClick(0.5);
-    };
-
-    // Update TV content timing
-    useEffect(() => {
-        // Show content after a brief delay to allow for position animation to start
+// Show content after a brief delay to allow for position animation to start
         const showContentTimer = setTimeout(() => {
             setShowContent(true);
         }, 400);
@@ -282,24 +270,18 @@ function TVNews() {
         };
     }, []);
 
-    // Animate scan line
     useEffect(() => {
         if (isOn) {
             const scanInterval = setInterval(() => {
-                setScanLinePosition(prev => {
-                    if (prev > 350) return 0;
-                    return prev + 2;
-                });
+                setScanLinePosition((prev) => (prev > 350 ? 0 : prev + 2));
             }, 50);
 
             return () => clearInterval(scanInterval);
         }
     }, [isOn]);
 
-    // Handle zoom in click
     const handleZoomClick = () => {
-        playClickSound(); // Play click sound
-        navigate('/transition');
+
     };
 
     // Handle TV control clicks
@@ -318,26 +300,19 @@ function TVNews() {
 
             <Television
                 initial={{
-                    top: '275px',
                     left: '250px',
+                    top: '275px',
                     width: '150px',
                     height: '100px',
                     borderRadius: '5px',
-                    opacity: 0.9
+                    opacity: 0.9,
                 }}
                 animate={{
-                    top: '50%',
-                    left: '50%',
-                    width: '70%',
-                    height: '100%',
-                    borderRadius: '20px',
-                    opacity: 1,
-                    x: '-50%',
-                    y: '-50%'
+
                 }}
                 transition={{
-                    duration: 0.8,
-                    ease: 'easeInOut'
+                    duration: 1,
+                    ease: 'easeInOut',
                 }}
             >
                 <TVScreen isOn={isOn}>
@@ -400,26 +375,12 @@ function TVNews() {
                                             <CountryRate>46%</CountryRate>
                                         </Country>
 
-                                        <Country onClick={handleCountryClick}>
-                                            <CountryFlag color="#FFFFFF" style={{ border: '1px solid black' }}>
-                                                <div style={{
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    borderRadius: '50%',
-                                                    backgroundColor: '#BC002D',
-                                                    margin: '5px auto'
-                                                }} />
-                                            </CountryFlag>
+
                                             <CountryName>JAPAN</CountryName>
                                             <CountryRate>24%</CountryRate>
                                         </Country>
 
-                                        <Country onClick={handleCountryClick}>
-                                            <CountryFlag style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                backgroundColor: 'white'
-                                            }}>
+
                                                 <div style={{ height: '10px', backgroundColor: '#ED1C24' }} />
                                                 <div style={{ height: '10px', backgroundColor: '#241D4F' }} />
                                                 <div style={{ height: '10px', backgroundColor: '#ED1C24' }} />
@@ -435,12 +396,12 @@ function TVNews() {
                                         whileTap={{ scale: 0.95 }}
                                         animate={{
                                             opacity: [0.7, 1, 0.7],
-                                            scale: [1, 1.05, 1]
+                                            scale: [1, 1.05, 1],
                                         }}
                                         transition={{
                                             duration: 2,
                                             repeat: Infinity,
-                                            repeatType: "reverse"
+                                            repeatType: 'reverse',
                                         }}
                                     >
                                         🔍 Zoom In
@@ -453,14 +414,12 @@ function TVNews() {
                                     transition={{ delay: 0.9, duration: 0.5 }}
                                 >
                                     <NewsTickerText>
-                                        NEW TARIFFS ANNOUNCED • GLOBAL MARKETS RESPOND • TRADE TENSIONS ESCALATE • ECONOMIC IMPACT ANALYSIS
+                                        NEW TARIFFS ANNOUNCED • GLOBAL MARKETS RESPOND • TRADE TENSIONS ESCALATE •
+                                        ECONOMIC IMPACT ANALYSIS
                                     </NewsTickerText>
                                 </NewsTicker>
 
-                                <TVScanLine
-                                    style={{ top: `${scanLinePosition}px` }}
-                                />
-
+                                <TVScanLine style={{ top: `${scanLinePosition}px` }} />
                                 <StaticEffect />
                             </>
                         )}
@@ -468,9 +427,7 @@ function TVNews() {
                 </TVScreen>
 
                 <TVControls>
-                    <TVControl onClick={handleTVControlClick} />
-                    <TVControl $main={true} onClick={handleTVControlClick} />
-                    <TVControl onClick={handleTVControlClick} />
+
                 </TVControls>
 
                 <TVBrand>RETROTV</TVBrand>
