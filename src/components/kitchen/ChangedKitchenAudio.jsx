@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import globalAudio from '../../utils/GlobalAudio';
 
-// ChangedKitchenAudio component - redesigned to work with global audio system
+// ChangedKitchenAudio component - redesigned to work with global audio system and synchronized timing
 // Updated version for ChangedKitchen that plays failure sounds instead of success sounds
 const ChangedKitchenAudio = ({
                                  isStirring = false,
@@ -9,13 +9,21 @@ const ChangedKitchenAudio = ({
                                  newDiscovery = false,
                                  showCraftPanel = null,
                                  tvOn = false,
-                                 isMuted = false
+                                 isMuted = false,
+                                 onAudioDurationChange = null // Callback for reporting actual audio durations
                              }) => {
     // Keep track of previous state to detect changes
     const prevShowCraftPanelRef = useRef(showCraftPanel);
     const prevNewDiscoveryRef = useRef(newDiscovery);
     const prevTvOnRef = useRef(tvOn);
     const prevIsMutedRef = useRef(isMuted);
+    const prevIsStirringRef = useRef(isStirring);
+
+    // Track actual audio durations with a single synchronized value
+    const [actualAudioDurations, setActualAudioDurations] = useState({
+        stirring: 2000, // Default fixed value since we don't have stirring sound
+        discovery: 2000 // Default value
+    });
 
     // Refs for timers
     const ambientSoundTimerRef = useRef(null);
@@ -32,6 +40,15 @@ const ChangedKitchenAudio = ({
     // Track if reaction has played initially
     const initialReactionPlayedRef = useRef(false);
     const initialReactionTimeoutRef = useRef(null);
+
+    // Audio element references for duration tracking
+    const failSoundRef = useRef(null);
+
+    // Ref to track the last measured durations to avoid redundant updates
+    const lastMeasuredDurationsRef = useRef({
+        stirring: 2000, // Fixed value since we don't have stirring sound
+        discovery: 0
+    });
 
     // Audio file IDs
     const AUDIO_IDS = {
@@ -81,6 +98,60 @@ const ChangedKitchenAudio = ({
         }
 
         return false;
+    };
+
+    // Function to synchronize audio durations
+    const synchronizeAudioDurations = () => {
+        // For discovery sound only, since we don't have stirring sound
+        const discoveryDuration = lastMeasuredDurationsRef.current.discovery;
+
+        // Use discovery duration if available, otherwise use fixed value for stirring
+        const maxDuration = discoveryDuration > 0 ? discoveryDuration : 2000;
+
+        console.log(`[ChangedKitchenAudio] Synchronizing audio durations to: ${maxDuration}ms`);
+
+        // Update state with synchronized durations
+        setTimeout(() => {
+            setActualAudioDurations({
+                stirring: maxDuration, // Use same duration for all animations
+                discovery: maxDuration
+            });
+        }, 0);
+    };
+
+    // Function to measure audio duration and update state
+    const measureAudioDuration = (audioElement, soundType) => {
+        if (!audioElement) return;
+
+        // Only update durations if we have an actual audio element to measure
+        const handleLoadedMetadata = () => {
+            const duration = audioElement.duration * 1000; // Convert to milliseconds
+
+            // Ensure we use at least the minimum duration of 2000ms
+            let newDuration = Math.max(duration, 2000);
+
+            // Store the measured duration to avoid redundant updates
+            if (soundType === 'discovery') {
+                console.log(`[ChangedKitchenAudio] Measured discovery sound duration: ${duration}ms`);
+                lastMeasuredDurationsRef.current.discovery = newDuration;
+
+                // Synchronize durations after measurement
+                synchronizeAudioDurations();
+            }
+        };
+
+        // Add event listener to measure duration once metadata is loaded
+        audioElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+        // If the metadata is already loaded, call the handler immediately
+        if (audioElement.readyState >= 1) {
+            handleLoadedMetadata();
+        }
+
+        // Return cleanup function
+        return () => {
+            audioElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        };
     };
 
     // Initial setup - runs only once
@@ -200,7 +271,7 @@ const ChangedKitchenAudio = ({
         ambientSoundTimerRef.current = timer;
     };
 
-    // Start grandma reaction timer - now with a faster interval
+    // Start grandma reaction timer
     const startGrandmaReactionTimer = () => {
         if (grandmaReactionTimerRef.current) {
             clearInterval(grandmaReactionTimerRef.current);
@@ -253,6 +324,24 @@ const ChangedKitchenAudio = ({
         prevIsMutedRef.current = isMuted;
     }, [isMuted]);
 
+    // Effect for handling stirring state
+    useEffect(() => {
+        // Only trigger when stirring state changes from false to true
+        if (isStirring && !prevIsStirringRef.current && !isMuted) {
+            // We don't have a stirring sound, so we'll just play a UI click sound if available
+            if (globalAudio.isSoundLoaded(AUDIO_IDS.UI_CLICK)) {
+                console.log('[ChangedKitchenAudio] Playing UI click for stirring action');
+                globalAudio.playSound(AUDIO_IDS.UI_CLICK, 0.5);
+            }
+
+            // Always use the synchronized duration
+            synchronizeAudioDurations();
+        }
+
+        // Update the ref for next render
+        prevIsStirringRef.current = isStirring;
+    }, [isStirring, isMuted]);
+
     // Effect for handling new discovery (plays fail sound instead of success)
     useEffect(() => {
         // Only play sound when discovery state changes from false to true
@@ -266,12 +355,9 @@ const ChangedKitchenAudio = ({
                 AUDIO_IDS.GRANDMA_FAIL_5
             ];
 
-            // Check which fail sounds are loaded
             const loadedCraftSounds = craftSounds.filter(id =>
                 globalAudio.isSoundLoaded(id)
             );
-
-            console.log(`[ChangedKitchenAudio] Loaded fail sounds: ${loadedCraftSounds.length}`);
 
             if (loadedCraftSounds.length > 0) {
                 const randomIndex = Math.floor(Math.random() * loadedCraftSounds.length);
@@ -280,21 +366,41 @@ const ChangedKitchenAudio = ({
                 // Mark that a fail sound is playing to prevent reaction sounds
                 failSoundPlayingRef.current = true;
 
-                // Play the fail sound
-                globalAudio.playSound(soundId, 1.0);
+                // Play the fail sound and store the audio element reference
+                const audioElement = globalAudio.playSound(soundId, 1.0);
+                failSoundRef.current = audioElement;
+
                 console.log(`[ChangedKitchenAudio] Playing fail sound: ${soundId}`);
+
+                // Measure the actual duration of the sound
+                if (audioElement) {
+                    measureAudioDuration(audioElement, 'discovery');
+
+                    // Create event to detect when sound finishes playing
+                    audioElement.addEventListener('ended', () => {
+                        console.log('[ChangedKitchenAudio] Fail sound finished playing naturally');
+
+                        // Reset state now that sound has finished
+                        failSoundPlayingRef.current = false;
+                        failSoundRef.current = null;
+                    }, { once: true });
+                }
 
                 // Clear any existing timeout
                 if (failSoundTimeoutRef.current) {
                     clearTimeout(failSoundTimeoutRef.current);
                 }
 
-                // Set timeout to allow reactions again after 5 seconds
+                // Set a fallback timeout to prevent indefinite blocking of reaction sounds
+                // Use synchronized duration with buffer
+                const fallbackTimeout = Math.max(lastMeasuredDurationsRef.current.discovery || 2000, 5000);
                 failSoundTimeoutRef.current = setTimeout(() => {
-                    failSoundPlayingRef.current = false;
+                    if (failSoundPlayingRef.current) {
+                        failSoundPlayingRef.current = false;
+                        console.log("[ChangedKitchenAudio] Fail sound fallback timeout completed");
+                    }
                     failSoundTimeoutRef.current = null;
-                    console.log("[ChangedKitchenAudio] Fail sound timeout complete, reactions enabled");
-                }, 5000);
+                }, fallbackTimeout);
             } else {
                 // If no fail sounds are loaded yet, log the issue
                 console.log("[ChangedKitchenAudio] No fail sounds loaded, checking sound status:");
@@ -325,31 +431,18 @@ const ChangedKitchenAudio = ({
         prevShowCraftPanelRef.current = showCraftPanel;
     }, [showCraftPanel, isMuted]);
 
-    // Effect for handling stirring sound
-    useEffect(() => {
-        // Play sound when user starts stirring
-        if (isStirring && !isMuted && globalAudio.isSoundLoaded(AUDIO_IDS.UI_CLICK)) {
-            // Play UI click sound as a stirring sound
-            globalAudio.playSound(AUDIO_IDS.UI_CLICK, 0.3);
-        }
-    }, [isStirring, isMuted]);
-
-    // Effect for handling TV state (adjust background volume and switch to techno music for TV scene)
+    // Effect for handling TV state
     useEffect(() => {
         if (tvOn !== prevTvOnRef.current) {
             if (tvOn) {
-                // TV has been turned on - this will be handled in the TVNews component
-                // which will call globalAudio.setScene('tvnews')
-
-                // Just fade out piano music in anticipation
+                // TV has been turned on - will be handled in the TVNews component
+                // Fade out piano music in anticipation
                 if (globalAudio.isLoopActive(AUDIO_IDS.PIANO)) {
                     globalAudio.setLoopVolume(AUDIO_IDS.PIANO, 0.1);
                 }
             } else if (!tvOn && globalAudio.isLoopActive(AUDIO_IDS.PIANO)) {
-                // TV has been turned off
-                // Restore normal volume for kitchen music
+                // TV has been turned off - restore normal volume for kitchen music
                 globalAudio.setLoopVolume(AUDIO_IDS.PIANO, 0.4);
-
                 // Make sure we're in kitchen scene
                 globalAudio.setScene('kitchen');
             }
@@ -359,15 +452,33 @@ const ChangedKitchenAudio = ({
         prevTvOnRef.current = tvOn;
     }, [tvOn]);
 
+    // Update audio durations and notify parent when they change
+    useEffect(() => {
+        if (onAudioDurationChange) {
+            // When the actual measured audio durations change, notify the parent
+            const discoveryDuration = lastMeasuredDurationsRef.current.discovery;
+            const maxDuration = discoveryDuration > 0 ? discoveryDuration : 2000;
+
+            // Report the synchronized durations to parent
+            onAudioDurationChange({
+                stirring: maxDuration,
+                discovery: maxDuration
+            });
+        }
+    }, [lastMeasuredDurationsRef.current.discovery, onAudioDurationChange]);
+
     // Cleanup function when component unmounts
     useEffect(() => {
         return () => {
             console.log("[ChangedKitchenAudio] Unmounting, cleaning up audio resources");
 
-            // Don't stop background sounds on unmount, as they should persist
-            // between scene changes. If you want to stop them, uncomment:
-            // globalAudio.stopLoop(AUDIO_IDS.PIANO);
-            // globalAudio.stopLoop(AUDIO_IDS.OCEAN);
+            if (failSoundRef.current) {
+                failSoundRef.current.pause();
+                failSoundRef.current = null;
+            }
+
+            // Don't stop background sounds on unmount as they should persist
+            // between scene changes.
 
             // Clear timers
             cleanupTimers();

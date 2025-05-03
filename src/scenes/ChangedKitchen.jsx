@@ -49,6 +49,27 @@ function ChangedKitchen({ gameState }) {
     const [audioEnabled, setAudioEnabled] = useState(true);
     const audioTriggeredRef = useRef(false);
 
+    // Default animation duration if no audio is present
+    const DEFAULT_ANIMATION_DURATION = 2000; // 2 seconds
+
+    // Audio duration - will be updated based on actual audio duration
+    const [audioDuration, setAudioDuration] = useState(DEFAULT_ANIMATION_DURATION);
+
+    // Track when stirring animation should end
+    const stirringTimeoutRef = useRef(null);
+
+    // Callback to update audio duration when it changes
+    const handleAudioDurationChange = (newDurations) => {
+        // Use the discovery duration as our primary duration
+        // (since we don't have stirring sound)
+        const newDuration = newDurations.discovery || DEFAULT_ANIMATION_DURATION;
+
+        if (newDuration > 0 && newDuration !== audioDuration) {
+            console.log(`[ChangedKitchen] Audio duration updated to: ${newDuration}ms`);
+            setAudioDuration(newDuration);
+        }
+    };
+
     // Initial ingredients with a focus on noodle-making
     const [ingredientsDiscovered, setIngredientsDiscovered] = useState([
         { id: 1, name: "Water", emoji: "💧", color: "#E3F2FD", category: "base" },
@@ -76,6 +97,9 @@ function ChangedKitchen({ gameState }) {
 
         return () => {
             // Cleanup code if needed
+            if (stirringTimeoutRef.current) {
+                clearTimeout(stirringTimeoutRef.current);
+            }
             // Note: we don't stop background loops on unmount
             // as they should continue between scenes
         };
@@ -136,6 +160,34 @@ function ChangedKitchen({ gameState }) {
         return () => window.removeEventListener('keydown', handleKeyPress);
     }, [tvOn]);
 
+    // Animation timing effect - listen for audio duration changes
+    useEffect(() => {
+        // If stirring is currently active, update the timeout to match the new duration
+        if (isStirring) {
+            console.log(`[ChangedKitchen] Audio duration for stirring updated to: ${audioDuration}ms`);
+
+            // Clear existing timeout if it exists
+            if (stirringTimeoutRef.current) {
+                clearTimeout(stirringTimeoutRef.current);
+            }
+
+            // Set a new timeout to stop stirring after the audio duration
+            stirringTimeoutRef.current = setTimeout(() => {
+                console.log('[ChangedKitchen] Stirring animation timeout complete, stopping stirring');
+                setIsStirring(false);
+                stirringTimeoutRef.current = null;
+            }, audioDuration);
+        }
+
+        // Cleanup function - clear timeout if component unmounts or isStirring changes
+        return () => {
+            if (stirringTimeoutRef.current) {
+                clearTimeout(stirringTimeoutRef.current);
+                stirringTimeoutRef.current = null;
+            }
+        };
+    }, [audioDuration, isStirring]);
+
     // TV turn on sequence
     const turnOnTV = useCallback(() => {
         setShowPrompt(false);
@@ -194,7 +246,17 @@ function ChangedKitchen({ gameState }) {
         let result = InfiniteRecipes[combination] || InfiniteRecipes[reverseCombination];
 
         if (result) {
-            // Check if this is a new discovery
+            // Update pot contents
+            setPotContent({
+                name: result.name,
+                color: result.color,
+                emoji: result.emoji
+            });
+
+            // Start stirring animation immediately
+            setIsStirring(true);
+
+            // Check if this is a new discovery - handles discovery notification
             setIngredientsDiscovered(prevDiscovered => {
                 const alreadyDiscovered = prevDiscovered.some(i => i.name === result.name);
 
@@ -210,7 +272,13 @@ function ChangedKitchen({ gameState }) {
                 if (!alreadyDiscovered) {
                     // Show discovery notification
                     setNewDiscovery(result.name);
-                    setTimeout(() => setNewDiscovery(null), 3000);
+
+                    // Use the current audio duration plus a buffer for notification
+                    // This needs to be long enough to cover the discovery sound
+                    const notificationDuration = Math.max(audioDuration, 5000) + 500;
+                    console.log(`[ChangedKitchen] Setting discovery notification timeout: ${notificationDuration}ms`);
+
+                    setTimeout(() => setNewDiscovery(null), notificationDuration);
 
                     // Automatically open the recipe book to show new discovery
                     setShowCraftPanel(true);
@@ -222,23 +290,16 @@ function ChangedKitchen({ gameState }) {
                 return prevDiscovered;
             });
 
-            // Update pot contents
-            setPotContent({
-                name: result.name,
-                color: result.color,
-                emoji: result.emoji
-            });
-
-            // Animate cooking
-            setIsStirring(true);
-            setTimeout(() => setIsStirring(false), 2000);
+            // NOTE: We do NOT set a timeout to end stirring here!
+            // Instead, we let the KitchenAudio component tell us when to stop stirring
+            // by updating the audioDuration, which will be picked up in the useEffect below
         }
 
         // Clear selection slots after a short delay
         setTimeout(() => {
             setSelectedIngredients([null, null]);
         }, 1000);
-    }, []);
+    }, [audioDuration]);
 
     // Toggle recipe book
     const toggleCraftPanel = useCallback(() => {
@@ -255,6 +316,7 @@ function ChangedKitchen({ gameState }) {
                 showCraftPanel={showCraftPanel}
                 tvOn={tvOn}
                 isMuted={!audioEnabled}
+                onAudioDurationChange={handleAudioDurationChange}
             />
 
             {/* Replace KitchenBackground with direct BackgroundImage usage */}
@@ -265,6 +327,7 @@ function ChangedKitchen({ gameState }) {
                 isStirring={isStirring}
                 tariffImpact={tariffImpact}
                 seafoodImpact={seafoodImpact}
+                audioLength={audioDuration} // Pass the audio duration to cooking area
             />
 
             <RecipeBook onClick={toggleCraftPanel} />
