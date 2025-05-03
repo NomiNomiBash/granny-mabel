@@ -3,7 +3,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { KitchenBackground } from '../components/kitchen/KitchenBackground';
+import { BackgroundImage } from '../components/shared/BackgroundImage'; // Import the utility component
+import backgroundImage from '../assets/background.png'; // Import the background image
 import { CookingArea } from '../components/kitchen/CookingArea';
 import { RecipeBook } from '../components/kitchen/RecipeBook';
 import { TelevisionComponent } from '../components/kitchen/Television';
@@ -276,7 +277,9 @@ function Kitchen() {
                 onAudioDurationChange={handleAudioDurationChange}
             />
 
-            <KitchenBackground />
+            {/* Replace KitchenBackground with direct BackgroundImage usage */}
+            <BackgroundImage image={backgroundImage} />
+
             <CookingArea
                 potContent={potContent}
                 isStirring={isStirring}
@@ -359,7 +362,7 @@ const SoundToggle = styled.button`
 
 // Keep the main container here for cleaner imports
 const KitchenContainer = styled.div`
-    background-color: #87CEEB; // Sky blue background for the ocean view
+    background-color: transparent; /* Changed from #87CEEB to transparent */
     height: 100vh;
     width: 100vw;
     position: relative;
