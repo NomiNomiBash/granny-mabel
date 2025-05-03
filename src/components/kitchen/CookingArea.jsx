@@ -95,25 +95,6 @@ const StirringArm = styled(motion.img)`
     z-index: 1; /* Lower z-index to be behind */
 `;
 
-const Background = styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Updated gradient for a smoother transition from sky to sea */
-    background: linear-gradient(
-            to bottom,
-            #8ec4e6 0%,      /* Lighter sky blue at top */
-            #87CEEB 40%,     /* Sky blue */
-            #65b5e6 55%,     /* Transition color */
-            #4aa6e2 60%,     /* Another transition color */
-            #1E90FF 70%,     /* Deep sea blue */
-            #0d75d1 100%     /* Deeper sea blue at bottom */
-    );
-    z-index: 0;
-`;
-
 // Fallback SVG for missing images
 const GRANDMA_FALLBACK_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='200' viewBox='0 0 150 200'%3E%3Crect width='150' height='200' fill='%23f0d0c0'/%3E%3Ccircle cx='75' cy='60' r='30' fill='%23ffe0b2'/%3E%3Crect x='45' y='95' width='60' height='80' fill='%23f06292'/%3E%3Crect x='55' y='85' width='40' height='20' fill='%23ffffff'/%3E%3C/svg%3E";
 
@@ -270,9 +251,6 @@ export const CookingArea = ({
 
     return (
         <>
-            {/* Simple sky and sea background with smoother gradient */}
-            <Background />
-
             <KitchenCounter>
                 <CounterImage
                     src={kitchenCounterImage}

@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Import the BackgroundImage utility directly
+import { BackgroundImage } from '../components/shared/BackgroundImage';
+import backgroundImage from '../assets/background.png';
+
 // Import or create components similar to the Kitchen scene
-import { KitchenBackground } from '../components/kitchen/KitchenBackground';
 import { CookingArea } from '../components/kitchen/CookingArea';
 import { RecipeBook } from '../components/kitchen/RecipeBook';
 import { TelevisionComponent } from '../components/kitchen/Television';
@@ -254,7 +257,9 @@ function ChangedKitchen({ gameState }) {
                 isMuted={!audioEnabled}
             />
 
-            <KitchenBackground />
+            {/* Replace KitchenBackground with direct BackgroundImage usage */}
+            <BackgroundImage image={backgroundImage} />
+
             <CookingArea
                 potContent={potContent}
                 isStirring={isStirring}
@@ -355,7 +360,7 @@ const SoundToggle = styled.button`
 
 // Keep the main container here for cleaner imports
 const KitchenContainer = styled.div`
-    background-color: #87CEEB; // Sky blue background for the ocean view
+    background-color: transparent; /* Changed from #87CEEB to transparent */
     height: 100vh;
     width: 100vw;
     position: relative;
