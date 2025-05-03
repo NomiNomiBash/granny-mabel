@@ -472,6 +472,7 @@ function TariffChamber({ gameState, setGameState }) {
     // Initial tariff data based on provided information
     const [tariffs, setTariffs] = useState([
         { country: "European Union", region: "Europe", tariffRate: 20, baseTariff: 20, position: { top: 40, left: 45 }, size: 35 },
+        { country: "Iran", region: "Asia", tariffRate: 20, baseTariff: 20, position: { top: 40, left: 45 }, size: 35 },
         { country: "China", region: "Asia", tariffRate: 54, baseTariff: 54, position: { top: 45, left: 70 }, size: 40 },
         { country: "Vietnam", region: "Asia", tariffRate: 46, baseTariff: 46, position: { top: 55, left: 73 }, size: 25 },
         { country: "Thailand", region: "Asia", tariffRate: 36, baseTariff: 36, position: { top: 60, left: 70 }, size: 22 },
