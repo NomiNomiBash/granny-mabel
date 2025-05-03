@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import anchorImage from '../assets/chihuahua.png'; // Update this path
+import globalAudio from '../utils/GlobalAudio'; // Import global audio
 
 const TVContainer = styled.div`
     width: 100vw;
@@ -57,6 +59,15 @@ const TVControl = styled.div`
     border-radius: 50%;
     background-color: #333333;
     border: 2px solid #555555;
+    cursor: pointer; /* Add cursor pointer for interactive feel */
+
+    &:hover {
+        background-color: #444444; /* Hover effect */
+    }
+
+    &:active {
+        background-color: #222222; /* Active effect */
+    }
 `;
 
 const TVBrand = styled.div`
@@ -121,36 +132,23 @@ const NewsTickerText = styled(motion.div)`
 
 const SplitScreen = styled.div`
     display: flex;
-    height: 120px;
     gap: 10px;
 `;
 
 const AnchorBox = styled.div`
-    width: 150px;
-    height: 120px;
+    width: 450px;
+    height: 300px;
     background-color: #34495E;
     position: relative;
 `;
 
 const AnchorFigure = styled.div`
     position: absolute;
-    width: 60px;
-    height: 100px;
-    top: 10px;
+    width: 450px;
     left: 45px;
-`;
-
-const AnchorHead = styled.div`
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #7F8C8D;
-`;
-
-const AnchorBody = styled.div`
-    width: 60px;
-    height: 40px;
-    background-color: #7F8C8D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 const MainStory = styled.div`
@@ -178,7 +176,7 @@ const TariffItem = styled.li`
 `;
 
 const CountriesPanel = styled.div`
-    margin-top: 10px;
+    margin-left: 50%;
     background-color: white;
     padding: 10px;
     display: flex;
@@ -190,6 +188,11 @@ const Country = styled.div`
     flex-direction: column;
     align-items: center;
     width: 60px;
+    cursor: pointer; /* Add cursor pointer for interaction */
+
+    &:hover {
+        transform: scale(1.05); /* Add subtle hover effect */
+    }
 `;
 
 const CountryFlag = styled.div`
@@ -255,6 +258,7 @@ function TVNews() {
     const [scanLinePosition, setScanLinePosition] = useState(0);
     const [isCentering, setIsCentering] = useState(false);
 
+
     useEffect(() => {
 // Show content after a brief delay to allow for position animation to start
         const showContentTimer = setTimeout(() => {
@@ -277,11 +281,17 @@ function TVNews() {
     }, [isOn]);
 
     const handleZoomClick = () => {
-        setShowContent(false);
-        setIsCentering(true);
-        setTimeout(() => {
-            navigate('/tariff-chamber');
-        }, 800);
+
+    };
+
+    // Handle TV control clicks
+    const handleTVControlClick = () => {
+        playClickSound(); // Play click sound
+    };
+
+    // Handle country click
+    const handleCountryClick = () => {
+        playClickSound(); // Play click sound
     };
 
     return (
@@ -298,17 +308,7 @@ function TVNews() {
                     opacity: 0.9,
                 }}
                 animate={{
-                    top: isCentering ? '0%' : showContent ? '50%' : '275px',
-                    left: isCentering ? '0%' : showContent ? '50%' : '250px',
-                    width: isCentering ? '100vw' : showContent ? '500px' : '150px',
-                    height: isCentering ? '100vh' : showContent ? '450px' : '100px',
-                    borderRadius: isCentering ? '0px' : showContent ? '20px' : '5px',
-                    opacity: isCentering ? 0 : 1,
-                    transform: isCentering
-                        ? 'translate(0, 0)'
-                        : showContent
-                        ? 'translate(-50%, -50%)'
-                        : 'translate(0, 0)', // Ensure no translation when not centering or showing content
+
                 }}
                 transition={{
                     duration: 1,
@@ -335,8 +335,15 @@ function TVNews() {
                                     <SplitScreen>
                                         <AnchorBox>
                                             <AnchorFigure>
-                                                <AnchorHead />
-                                                <AnchorBody />
+                                                <img
+                                                    src={anchorImage}
+                                                    alt="News Anchor"
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '100%',
+                                                        objectFit: 'contain'
+                                                    }}
+                                                />
                                             </AnchorFigure>
                                         </AnchorBox>
 
@@ -345,39 +352,35 @@ function TVNews() {
                                             <TariffList>
                                                 <TariffItem>10% baseline tariff on all imports</TariffItem>
                                                 <TariffItem>Custom rates for "worst offenders"</TariffItem>
-                                                <TariffItem>China: 54%, EU: 20%, Japan: 24%</TariffItem>
-                                                <TariffItem>Vietnam: 46%, Thailand: 36%</TariffItem>
                                             </TariffList>
                                         </MainStory>
                                     </SplitScreen>
 
                                     <CountriesPanel>
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag color="#DE2910" />
                                             <CountryName>CHINA</CountryName>
                                             <CountryRate>54%</CountryRate>
                                         </Country>
 
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag color="#003399" />
                                             <CountryName>EU</CountryName>
                                             <CountryRate>20%</CountryRate>
                                         </Country>
 
-                                        <Country>
+                                        <Country onClick={handleCountryClick}>
                                             <CountryFlag color="#DA251D" />
                                             <CountryName>VIETNAM</CountryName>
                                             <CountryRate>46%</CountryRate>
                                         </Country>
 
-                                        <Country>
-                                            <CountryFlag color="#BC002D" />
+
                                             <CountryName>JAPAN</CountryName>
                                             <CountryRate>24%</CountryRate>
                                         </Country>
 
-                                        <Country>
-                                            <CountryFlag>
+
                                                 <div style={{ height: '10px', backgroundColor: '#ED1C24' }} />
                                                 <div style={{ height: '10px', backgroundColor: '#241D4F' }} />
                                                 <div style={{ height: '10px', backgroundColor: '#ED1C24' }} />
@@ -424,9 +427,7 @@ function TVNews() {
                 </TVScreen>
 
                 <TVControls>
-                    <TVControl $main={true} />
-                    <TVControl />
-                    <TVControl />
+
                 </TVControls>
 
                 <TVBrand>RETROTV</TVBrand>
